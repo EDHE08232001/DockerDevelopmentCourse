@@ -5,25 +5,25 @@
 ### Check Docker Version
 This also verifies if cli can talk to the engine
 
-```
+```zsh
 docker version
 ```
 
 ### Examine Docker Configurations
-```
+```zsh
 docker info
 ```
 
 ## Docker Command Line Structure
 old way(still works):
 
-```
+```zsh
 docker <command> (options)
 ```
 
 new way:
 
-```
+```zsh
 docker <command> <sub-command> (options)
 ```
 
@@ -35,7 +35,7 @@ docker <command> <sub-command> (options)
     5. Docker's default image "registry" is called Docker Hub (hub.docker.com)
 
 ### Example Command
-```
+```zsh
 docker container run --publish 80:80 nginx
 ```
 
@@ -76,7 +76,7 @@ Host Machine (Port 80) ----> Docker Routes Traffic ----> Container (Port 80)
 ```
 
 ### Example Command
-We can also run ```docker container run --publish 80:80 --detach nginx```
+We can also run `docker container run --publish 80:80 --detach nginx`
 
 When you include the --detach option, Docker will start the container and return control of the terminal to you immediately, showing you the container ID. This allows you to run other commands without waiting for the container to finish.
 
@@ -89,3 +89,8 @@ When you include the --detach option, Docker will start the container and return
         - The --detach option makes the container run in the background.
 4. Output:
         - Docker will return the container ID to the terminal, indicating that the container is running in the background.
+
+### List Container Command
+```zsh
+docker container ls
+```
