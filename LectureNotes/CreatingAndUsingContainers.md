@@ -369,3 +369,63 @@ ifconfig en0
 - Docker assigns it an IP address from the docker0 bridge network.
 - This IP is internal to Docker and is not exposed to the host machine’s network directly.
 - The host machine has its own IP address assigned by the network it's connected to (e.g., your local router or ISP).
+
+## Docker Networks: CLI Management
+- `docker network ls` shows networks
+- `docker network inspect` inspects a network
+- `docker network create --driver` creats a network
+- `docker network connect` attaches a network to container
+- `docker network disconnect` detaches a network from container
+
+#### When you run the `docker network ls`, you are most likely to see these 3
+1. `--network bridge` default docker virtual network which is NAT'ed behind host ip
+2. 
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network ls
+NETWORK ID     NAME      DRIVER    SCOPE
+9100cc00fe3b   bridge    bridge    local
+8f4dc6256e0d   host      host      local
+8735aa6a0362   none      null      local
+```
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network inspect bridge
+[
+    {
+        "Name": "bridge",
+        "Id": "9100cc00fe3b204ce57681803dbb1e6fbc3347e156367a172e2148a56ee814df",
+        "Created": "2024-08-06T13:02:23.074269887Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.17.0.0/16",
+                    "Gateway": "172.17.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Ingress": false,
+        "ConfigFrom": {
+            "Network": ""
+        },
+        "ConfigOnly": false,
+        "Containers": {},
+        "Options": {
+            "com.docker.network.bridge.default_bridge": "true",
+            "com.docker.network.bridge.enable_icc": "true",
+            "com.docker.network.bridge.enable_ip_masquerade": "true",
+            "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+            "com.docker.network.bridge.name": "docker0",
+            "com.docker.network.driver.mtu": "65535"
+        },
+        "Labels": {}
+    }
+]
+```
