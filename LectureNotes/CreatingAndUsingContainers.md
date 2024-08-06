@@ -228,13 +228,15 @@ docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_R
 *Note*: -i is interactive and -t is pseudo-tty which stimulates a real terminal, like what SSH does
 
 ### Examples
+Running a New Container with an Interactive Terminal
+
 ```zsh
-# Run an nginx container with interactive terminal and bash shell
+# Run an nginx container with an interactive terminal and bash shell
 => docker container run -it --name proxy nginx bash
     # -it: Interactive terminal
     # --name proxy: Name the container 'proxy'
     # nginx: Use the 'nginx' image
-    # bash: Override default command and run 'bash' instead
+    # bash: Override the default command and run 'bash' instead
     # Running this command gives you a terminal inside the running container
 
 # Inside the container's bash shell
@@ -243,8 +245,12 @@ docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_R
 
 =># exit
     # Exit the bash shell, which stops the container because the container's main process (bash) has ended
+```
 
-# Run an Ubuntu container with interactive terminal
+Running an Ubuntu Container with an Interactive Terminal
+
+```zsh
+# Run an Ubuntu container with an interactive terminal
 => docker container run -it --name ubuntu ubuntu
     # -it: Interactive terminal
     # --name ubuntu: Name the container 'ubuntu'
@@ -254,7 +260,11 @@ docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_R
 
 =># exit
     # Exit the shell, which stops the Ubuntu container because the container's main process (the shell) has ended
+```
 
+Restarting a Stopped Container in Interactive Mode
+
+```zsh
 # Restart the previously stopped Ubuntu container in interactive mode
 => docker container start -ai ubuntu
     # start: Restart the container
@@ -264,7 +274,11 @@ docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_R
 
 =># exit
     # Exit the shell, which stops the container again
+```
 
+Executing a Command Inside a Running Container
+
+```zsh
 # Run a bash shell inside an already running MySQL container
 => docker container exec -it mysql bash
     # exec: Execute a command in a running container
@@ -279,9 +293,32 @@ docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_R
 =># exit
     # Exit the bash shell
     # This only stops the bash shell process, not the MySQL container itself, because exec runs additional processes inside the container
+```
 
+Listing Running Containers
+
+```zsh
 # List all running containers
 => docker container ls
     # This command shows that the MySQL container is still running even after exiting the bash shell
     # This is because the primary process (MySQL server) inside the container continues to run
 ```
+
+Additional Notes: Pulling an Alpine Image and Running a Shell
+
+```zsh
+# Pull the latest Alpine image
+=> docker pull alpine
+    # Pull the latest version of the Alpine Linux image
+
+# Run an Alpine container with an interactive terminal
+=> docker container run -it alpine sh
+    # -it: Interactive terminal
+    # alpine: Use the 'alpine' image
+    # sh: Run the 'sh' shell (bash is not included in the Alpine image by default)
+```
+
+#### Summary
+- Interactive Mode (-it): Provides a way to interact with the container via a terminal.
+- Attaching to Output (-a): Useful for monitoring and interacting with running processes.
+- Executing Commands (exec): Allows running additional commands inside an already running container without stopping it.
