@@ -322,3 +322,14 @@ Additional Notes: Pulling an Alpine Image and Running a Shell
 - Interactive Mode (-it): Provides a way to interact with the container via a terminal.
 - Attaching to Output (-a): Useful for monitoring and interacting with running processes.
 - Executing Commands (exec): Allows running additional commands inside an already running container without stopping it.
+
+## Concept: Docker Network
+
+### Docker Network Defaults
+1. Each container connected to a private virtual network `bridge`
+2. Each virtual network routes through NAT firewall on host IP
+3. All containers on a virtual network can talk to each other without -p
+4. Best pratice is to create a new virtual network for each app:
+    - network `my_web_app` for mysql and php/apache containers
+    - network `my_api` for mongo and nodejs conatiners
+
