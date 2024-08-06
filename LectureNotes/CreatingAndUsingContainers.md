@@ -178,3 +178,14 @@ docker container run --publish 8080:80 --name mynginx -d nginx:1.21.1 nginx -g "
     - Specifies the Docker image nginx and version 1.21.1 to use for the container.
 6. nginx -g "daemon off;":
     - Overrides the default command in the NGINX image. The command nginx -g "daemon off;" tells NGINX to run in the foreground (non-daemon mode), which is necessary for running it in a Docker container that needs to stay active.
+
+## Container vs. VM: It's just a process
+
+### Containers aren't Mini-VM's
+    - They are just processes
+    - Limited to what resources they can access
+    - Exit when process stops
+
+You can actually find containers as processes with `ps aux`, which shows all running processes. `ps aux | grep <process name>`
+
+Or to show docker processes with `docker ps`
