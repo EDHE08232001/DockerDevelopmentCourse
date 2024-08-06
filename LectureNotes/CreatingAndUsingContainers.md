@@ -212,10 +212,24 @@ docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_R
 => docker container ls
     ... Output: You have two processes/containers running
 => docker container top mysql
-    ... Processes in mysql
+    ... Processes in mysql container
 => docker container top nginx
-    ... Processes in nginx
+    ... Processes in nginx container
 => docker container inspect mysql
     ... How is mysql container configured and metadata config
+=> docker container stats
+    ... Live performance data of all containers
+```
 
+## Getting a Shell Inside Containers: No Need For SSH
+1. `docker container run -it`: start new container interactively
+2. `docker container exec -it`: run additional command in existing command
+
+*Note:*
+    - -i is interactive
+    - -t is pseudo-tty which stimulates a real terminal, like what SSH does
+
+### Examples
+```zsh
+=> docker container run -it 
 ```
