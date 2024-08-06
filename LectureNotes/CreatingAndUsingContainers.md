@@ -146,3 +146,8 @@ Nontheless, you can always add -f
 docker container rm -f <container_id> ...
 ```
 
+## What happens in `docker container run <image_name>`?
+1. Looks for that image locally in image cache
+2. If docker doesn't find any specified image, docker then looks in remote image repository (defaults to docker hub)
+3. Downloads the latest version (nginx: latest by default)
+
