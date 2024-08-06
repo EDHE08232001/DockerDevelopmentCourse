@@ -336,3 +336,5 @@ Additional Notes: Pulling an Alpine Image and Running a Shell
     - Defaults work well in many cases, but easy to swap to customize
 6. Make new virtual networks
 7. Attach containers to more than one virtual network (or none)
+8. Skip virtual networks and use host ip (--net=host)
+9. Use different docker network drivers to gain new abilities
