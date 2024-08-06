@@ -225,9 +225,7 @@ docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_R
 1. `docker container run -it`: start new container interactively
 2. `docker container exec -it`: run additional command in existing command
 
-*Note:*
-    - -i is interactive
-    - -t is pseudo-tty which stimulates a real terminal, like what SSH does
+*Note*: -i is interactive and -t is pseudo-tty which stimulates a real terminal, like what SSH does
 
 ### Examples
 ```zsh
