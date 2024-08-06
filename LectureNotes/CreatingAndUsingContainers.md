@@ -150,4 +150,12 @@ docker container rm -f <container_id> ...
 1. Looks for that image locally in image cache
 2. If docker doesn't find any specified image, docker then looks in remote image repository (defaults to docker hub)
 3. Downloads the latest version (nginx: latest by default)
+4. When required image is ready to go, docker creats a new container on that image and prepares to start
+5. Gives the container a virtual IP on a private network inside docker engine (Custimize the Networking)
+6. Opens up port 80 on host and forwards to port 80 in container in the earlier example (if ports specified, if no `--publish` no ports opened)
+7. That container then starts by using CMD in the image DOCKERFILE
 
+### A General Example
+```zsh
+docker container run --publish <HostPort>:<ContainerPort> --name <ContainerName> -d <Image>:<version> <Image: This changes CMD on start> -T
+```
