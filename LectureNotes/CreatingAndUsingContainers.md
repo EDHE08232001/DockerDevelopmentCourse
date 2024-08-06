@@ -59,6 +59,7 @@ In `--publish 80:80`, the first 80 is the port on your host machine (This is the
 #### How Routing Works?
 1. Request Initiaition
     - When you type 'httl://localhost' in your browser, it initiates a request to port 80 on your host machine
+    - Port 80 is the default port for localhost
 2. Host Port
     - The request reaches port 80 on your host machine. Docker intercepts this request because you have mapped this port to a container.
 3. Routing to Container Port
