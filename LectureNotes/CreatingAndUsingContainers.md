@@ -74,3 +74,18 @@ Browser (http://localhost:80)
         v
 Host Machine (Port 80) ----> Docker Routes Traffic ----> Container (Port 80)
 ```
+
+### Example Command
+We can also run ```docker container run --publish 80:80 --detach nginx```
+
+When you include the --detach option, Docker will start the container and return control of the terminal to you immediately, showing you the container ID. This allows you to run other commands without waiting for the container to finish.
+
+#### What It Does
+1. Create and Start a Container:
+        - Docker creates and starts a new container using the nginx image.
+2. Port Mapping:
+        - Port 80 on the host machine is mapped to port 80 inside the container.
+3. Run in Background:
+        - The --detach option makes the container run in the background.
+4. Output:
+        - Docker will return the container ID to the terminal, indicating that the container is running in the background.
