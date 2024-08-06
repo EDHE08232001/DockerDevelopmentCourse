@@ -338,3 +338,34 @@ Additional Notes: Pulling an Alpine Image and Running a Shell
 7. Attach containers to more than one virtual network (or none)
 8. Skip virtual networks and use host ip (--net=host)
 9. Use different docker network drivers to gain new abilities
+
+#### To inspect ip of a container
+Example:
+
+```zsh
+docker container inspect --format '{{ .NetworkSettings.IPAddress }}' <container name>
+```
+
+#### To check host machine ip address
+```zsh
+ifconfig en0
+```
+
+### So container ip is not the host machines ip, what happened?
+
+#### Docker Networking Basics
+1. Network Namespaces:
+    - Each Docker container runs in its own network namespace. This isolation allows containers to have their own IP addresses, separate from the host.
+2. Bridge Network:
+    - By default, Docker uses a bridge network called docker0. When a container is started, it gets an IP address from the range assigned to this bridge network. This IP address is visible within the context of Docker but not from the outside network unless specifically configured.
+3. Host IP:
+    - The host machine has its own IP address which is used to communicate with the outside world. This is the IP you see when you run `ifconfig en0` or `ip a`.
+
+#### Explanation
+- Container IP: The command docker container inspect --format '{{ .NetworkSettings.IPAddress }}' <container name> fetches the IP address of the container within the Docker network. This IP address is used for communication between containers on the same Docker network.
+- Host IP: The command `ifconfig en0` or `ip a` fetches the IP address of the host machine's network interface (e.g., en0 on macOS or eth0 on Linux). This IP address is used for communication between the host machine and the outside world.
+
+#### What happens when a container is started:
+- Docker assigns it an IP address from the docker0 bridge network.
+- This IP is internal to Docker and is not exposed to the host machine’s network directly.
+- The host machine has its own IP address assigned by the network it's connected to (e.g., your local router or ISP).
