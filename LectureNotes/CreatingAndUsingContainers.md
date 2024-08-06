@@ -111,3 +111,32 @@ docker container ls -a
 `docker container run` always starts a *new* container
 
 use `docker container start` to start an existing stopped one
+
+### run with --name
+```zsh
+docker container run --publish 80:80 --detach --name webhost nginx
+```
+
+Now you customized the name of a container
+
+### With a Specified Name, You Can Check Logs
+```zsh
+docker container logs webhost
+```
+
+```zsh
+docker container logs <container_name>
+```
+
+### top Command shows the processes running inside the container
+```zsh
+docker container top <container_name>
+```
+
+### To remove existing containing
+```zsh
+docker container rm <container_id1> <container_id2> <container_id3>
+```
+
+However, only inactive containers can be removed
+
