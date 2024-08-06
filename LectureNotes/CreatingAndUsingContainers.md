@@ -377,7 +377,7 @@ ifconfig en0
 - `docker network connect` attaches a network to container
 - `docker network disconnect` detaches a network from container
 
-#### When you run the `docker network ls`, you are most likely to see these 3
+### When you run the `docker network ls`, you are most likely to see these 3
 1. `--network bridge` default docker virtual network which is NAT'ed behind host ip
 2. `--network host` it gains performance by skipping virtual networks but sacrifices security of container model
 3. `--network none` removes eth0 and only leave you with localhost interface in container
@@ -429,4 +429,9 @@ edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network inspect br
         "Labels": {}
     }
 ]
+```
+
+### Configure network when start a container
+```zsh
+docker container run --detach --name <app name> --network <network name> <Image>
 ```
