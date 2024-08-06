@@ -379,7 +379,8 @@ ifconfig en0
 
 #### When you run the `docker network ls`, you are most likely to see these 3
 1. `--network bridge` default docker virtual network which is NAT'ed behind host ip
-2. 
+2. `--network host` it gains performance by skipping virtual networks but sacrifices security of container model
+3. `--network none` removes eth0 and only leave you with localhost interface in container
 
 ```zsh
 edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network ls
