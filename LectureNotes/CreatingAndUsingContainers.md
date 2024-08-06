@@ -435,3 +435,10 @@ edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network inspect br
 ```zsh
 docker container run --detach --name <app name> --network <network name> <Image>
 ```
+
+### Docker Network: Default Security
+1. Create your apps so frontend/backend sit on the same docker network
+2. Their inter-communication never leaves host
+3. All externally exposed ports closed by default
+4. You must expose manually with `-p` flag, which is better default security!!!
+5. This gets even better later with Swarm and Overlay networks
