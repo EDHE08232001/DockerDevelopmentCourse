@@ -44,3 +44,26 @@ docker container run --publish 80:80 nginx
 3. Opened port 80 on the host IP
 4. Routes that traffic to the container IP, port 80
 
+#### Concept of Port Mapping
+
+In '''--publish 80:80''', the first 80 is the port on your host machine (This is the physical or virtual machine where Docker is installed and running in this case. It could be your personal computer, a server, or a cloud instance). Any traffic reaches this port will be routed to the container. The second 80 is the container port, this is the port inside the container where the NGINX server is listening for incoming requests.
+
+#### How Routing Works?
+1. Request Initiaition
+    - When you type 'httl://localhost' in your browser, it initiates a request to port 80 on your host machine
+2. Host Port
+    - The request reaches port 80 on your host machine. Docker intercepts this request because you have mapped this port to a container.
+3. Routing to Container Port
+    - Docker then routes this request to port 80 inside the container. This is where the NGINX server is running and listening for incoming HTTP requests.
+4. Response
+    - NGINX processes the request and sends a response back through the same route: from the container port 80 back to the host port 80, and finally to your browser.
+
+#### Virtual Representation
+
+Browser (http://localhost:80)
+
+        |
+
+        v
+        
+Host Machine (Port 80) ----> Docker Routes Traffic ----> Container (Port 80)
