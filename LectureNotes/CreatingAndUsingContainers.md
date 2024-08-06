@@ -101,3 +101,13 @@ docker container stop <container_id>
 ```
 
 In most cases, you only need to type the first several digits of the container id in order to make it unique
+
+### ls Command with -a
+```zsh
+docker container ls -a
+```
+
+#### Concept: run vs. start
+`docker container run` always starts a *new* container
+
+use `docker container start` to start an existing stopped one
