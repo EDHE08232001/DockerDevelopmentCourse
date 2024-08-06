@@ -135,8 +135,14 @@ docker container top <container_name>
 
 ### To remove existing containing
 ```zsh
-docker container rm <container_id1> <container_id2> <container_id3>
+docker container rm <container_id> <container_id> <container_id>
 ```
 
 However, only inactive containers can be removed
+
+Nontheless, you can always add -f
+
+```zsh
+docker container rm -f <container_id> ...
+```
 
