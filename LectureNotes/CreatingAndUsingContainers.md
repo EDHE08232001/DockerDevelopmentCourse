@@ -229,5 +229,59 @@ docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_R
 
 ### Examples
 ```zsh
-=> docker container run -it 
+# Run an nginx container with interactive terminal and bash shell
+=> docker container run -it --name proxy nginx bash
+    # -it: Interactive terminal
+    # --name proxy: Name the container 'proxy'
+    # nginx: Use the 'nginx' image
+    # bash: Override default command and run 'bash' instead
+    # Running this command gives you a terminal inside the running container
+
+# Inside the container's bash shell
+=># ls -al
+    # List all files inside the container
+
+=># exit
+    # Exit the bash shell, which stops the container because the container's main process (bash) has ended
+
+# Run an Ubuntu container with interactive terminal
+=> docker container run -it --name ubuntu ubuntu
+    # -it: Interactive terminal
+    # --name ubuntu: Name the container 'ubuntu'
+    # ubuntu: Use the 'ubuntu' image
+    # If the image is not available locally, it will start downloading it
+    # This command opens a shell inside the Ubuntu container
+
+=># exit
+    # Exit the shell, which stops the Ubuntu container because the container's main process (the shell) has ended
+
+# Restart the previously stopped Ubuntu container in interactive mode
+=> docker container start -ai ubuntu
+    # start: Restart the container
+    # -a: Attach to the container's output
+    # -i: Interactive mode
+    # This command restarts the Ubuntu container and attaches to its shell
+
+=># exit
+    # Exit the shell, which stops the container again
+
+# Run a bash shell inside an already running MySQL container
+=> docker container exec -it mysql bash
+    # exec: Execute a command in a running container
+    # -it: Interactive terminal
+    # mysql: Name of the running MySQL container
+    # bash: The command to run inside the container (in this case, bash shell)
+    # This command gives you a terminal inside the already running MySQL container
+
+=># ps aux
+    # Show all running processes inside the MySQL container
+
+=># exit
+    # Exit the bash shell
+    # This only stops the bash shell process, not the MySQL container itself, because exec runs additional processes inside the container
+
+# List all running containers
+=> docker container ls
+    # This command shows that the MySQL container is still running even after exiting the bash shell
+    # This is because the primary process (MySQL server) inside the container continues to run
 ```
