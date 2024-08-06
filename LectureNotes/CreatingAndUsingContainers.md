@@ -202,3 +202,6 @@ docker container run --detach --publish 8080:80 --name apacheServer httpd
 ```zsh
 docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_ROOT_PASSWORD=yes mysql
 ```
+
+## What's going on in containers: CLI Process Monitoring
+
