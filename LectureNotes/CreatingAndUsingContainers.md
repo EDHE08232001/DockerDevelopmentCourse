@@ -59,9 +59,9 @@ In '''--publish 80:80''', the first 80 is the port on your host machine (This is
     - NGINX processes the request and sends a response back through the same route: from the container port 80 back to the host port 80, and finally to your browser.
 
 #### Virtual Representation
-'''marksdown
+```.md
 Browser (http://localhost:80)
         |
         v
 Host Machine (Port 80) ----> Docker Routes Traffic ----> Container (Port 80)
-'''
+```
