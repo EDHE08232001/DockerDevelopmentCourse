@@ -200,8 +200,22 @@ docker container run --detach --publish 8080:80 --name apacheServer httpd
 ```
 
 ```zsh
-docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_ROOT_PASSWORD=yes mysql
+docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_ROOT_PASSWORD=true mysql
 ```
 
 ## What's going on in containers: CLI Process Monitoring
 
+### Example
+```zsh
+=> docker container run --detach --name nginx nginx
+=> docker container run --detach --name mysql --env MYSQL_RANDOM_ROOT_PASSWORD=true mysql
+=> docker container ls
+    ... Output: You have two processes/containers running
+=> docker container top mysql
+    ... Processes in mysql
+=> docker container top nginx
+    ... Processes in nginx
+=> docker container inspect mysql
+    ... How is mysql container configured and metadata config
+
+```
