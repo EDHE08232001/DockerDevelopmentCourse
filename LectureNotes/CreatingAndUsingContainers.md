@@ -332,4 +332,7 @@ Additional Notes: Pulling an Alpine Image and Running a Shell
 4. Best pratice is to create a new virtual network for each app:
     - network `my_web_app` for mysql and php/apache containers
     - network `my_api` for mongo and nodejs conatiners
-
+5. "Batteries included, but removable":
+    - Defaults work well in many cases, but easy to swap to customize
+6. Make new virtual networks
+7. Attach containers to more than one virtual network (or none)
