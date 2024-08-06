@@ -189,3 +189,16 @@ docker container run --publish 8080:80 --name mynginx -d nginx:1.21.1 nginx -g "
 You can actually find containers as processes with `ps aux`, which shows all running processes. `ps aux | grep <process name>`
 
 Or to show docker processes with `docker ps`
+
+## More Examples
+```zsh
+docker container run --detach --publish 80:80 --name nginxWebHost nginx
+```
+
+```zsh
+docker container run --detach --publish 8080:80 --name apacheServer httpd
+```
+
+```zsh
+docker container run --detach --publish 3306:3306 --name db --env MYSQL_RANDOM_ROOT_PASSWORD=yes mysql
+```
