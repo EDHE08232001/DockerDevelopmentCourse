@@ -94,3 +94,10 @@ When you include the --detach option, Docker will start the container and return
 ```zsh
 docker container ls
 ```
+
+### After Running A Container, You Can Also Stop It
+```zsh
+docker container stop <container_id>
+```
+
+In most cases, you only need to type the first several digits of the container id in order to make it unique
