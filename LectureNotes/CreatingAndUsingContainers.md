@@ -159,3 +159,22 @@ docker container rm -f <container_id> ...
 ```zsh
 docker container run --publish <HostPort>:<ContainerPort> --name <ContainerName> -d <Image>:<version> <Image: This changes CMD on start> -T
 ```
+
+### A Concret Example
+```zsh
+docker container run --publish 8080:80 --name mynginx -d nginx:1.21.1 nginx -g "daemon off;"
+```
+
+#### Detailed Explanation of the Example
+1. docker container run:
+    - Starts a new Docker container.
+2. --publish 8080:80:
+    - Maps port 8080 on the host machine to port 80 inside the container. This means you can access the containerized NGINX server by navigating to http://localhost:8080.
+3. --name mynginx:
+    - Names the container mynginx. This makes it easier to manage the container (e.g., stopping it with docker container stop mynginx).
+4. -d:
+    - Runs the container in detached mode, freeing up the terminal for other commands.
+5. nginx:1.21.1:
+    - Specifies the Docker image nginx and version 1.21.1 to use for the container.
+6. nginx -g "daemon off;":
+    - Overrides the default command in the NGINX image. The command nginx -g "daemon off;" tells NGINX to run in the foreground (non-daemon mode), which is necessary for running it in a Docker container that needs to stay active.
