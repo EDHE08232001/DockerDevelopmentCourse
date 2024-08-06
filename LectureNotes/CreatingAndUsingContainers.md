@@ -442,3 +442,44 @@ docker container run --detach --name <app name> --network <network name> <Image>
 3. All externally exposed ports closed by default
 4. You must expose manually with `-p` flag, which is better default security!!!
 5. This gets even better later with Swarm and Overlay networks
+
+## Docker Network: DNS and How Containers Find Each Other
+
+### *Forget IP's*
+Static IP's and using IP's for talking to containers is an anti-pattern. Do your best to avoid it.
+
+### Docker DNS
+Docker daemon has a built-in DNS server that containers use by default
+
+### DNS Default Names
+Docker defaults the hostname to the container's name, but you can also set aliases
+
+Lets say, for example, you have two containers on yoru own customized network, a and b
+
+you can do `docker container exec -it my_nginx ping new_nginx` and `docker container exec -it new_nginx ping my_nginx`
+
+### Customized Networks
+When you create your own custom network, Docker sets up DNS automatically. This allows containers to find each other by name, eliminating the need for static IPs.
+
+#### Example of Creating a Custom Network and Running Containers
+```zsh
+docker network create my_custom_network
+docker run -d --name my_nginx --network my_custom_network nginx
+docker run -d --name new_nginx --network my_custom_network nginx
+```
+
+Now, my_nginx can ping new_nginx and vice versa using their container names.
+
+### REMEMBER, the default bridge network does not have DNS buil-in server by default. So use --link
+```zsh
+docker run -d --name my_nginx nginx
+docker run -d --name new_nginx --link my_nginx nginx
+docker exec -it new_nginx ping my_nginx
+```
+
+### Summary: Docker Network
+- Avoid using static IPs for container communication.
+- Use Docker's built-in DNS for name resolution.
+- Create custom networks for automatic DNS setup.
+- Use container names or aliases to facilitate communication.
+- Avoid the deprecated --link option; use custom networks instead.
