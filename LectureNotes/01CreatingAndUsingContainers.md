@@ -493,3 +493,4 @@ docker exec -it new_nginx ping my_nginx
 - Ensure `curl` is installed and on latest version for that distro
     * ubuntu: `apt -get update && apt -get install curl`
     * centos: `yum update curl`
+- Check `curl --version`
