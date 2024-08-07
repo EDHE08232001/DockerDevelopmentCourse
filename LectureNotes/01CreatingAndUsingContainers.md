@@ -133,7 +133,7 @@ docker container logs <container_name>
 docker container top <container_name>
 ```
 
-### To remove existing containing
+### To remove existing container
 ```zsh
 docker container rm <container_id> <container_id> <container_id>
 ```
@@ -639,7 +639,7 @@ deleted: sha256:f2fa9f4cf8fd0a521d40e34492b522cee3f35004047e617c75fadeb8bfd1e6b7
 
 Total reclaimed space: 400.4MB
 ```
-#### Steps:
+#### Explanation of Steps:
 
 1. **Use different Linux distro containers to check `curl` CLI tool version**:
     - This helps ensure that `curl` behaves consistently across different environments.
@@ -773,3 +773,5 @@ After completing the testing, you can clean up the Docker environment to free up
     ```
 
 By following these steps, you can test the `curl` CLI tool on different Linux distributions using Docker containers and clean up your environment afterward.
+
+### Example: DNS Round Robin Test
