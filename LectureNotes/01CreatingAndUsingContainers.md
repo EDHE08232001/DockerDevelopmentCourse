@@ -775,3 +775,250 @@ After completing the testing, you can clean up the Docker environment to free up
 By following these steps, you can test the `curl` CLI tool on different Linux distributions using Docker containers and clean up your environment afterward.
 
 ### Example: DNS Round Robin Test
+- Ever since Docker Engine 1.11, we can have multiple containers on a created network respond to the same DNS address
+- Create a new virtual network (default bridge driver)
+- Create two containers from `elasticsearch:2` image
+- Research and use `-network-alias search` when creating them to give them an additional DNS name to respond to
+- Run `alpine nslookup search` with `--net` to see the two containers list for the same DNS name
+- Run `centos curl -s search:92000` with `--net` multiple times until you see both 'name' fields show up
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network create mynetwork
+42fc8030ce6897270c80aa0d4535ee49e29ae29bc03e3d61892d77dda7adfe8b
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network --help
+
+Usage:  docker network COMMAND
+
+Manage networks
+
+Commands:
+  connect     Connect a container to a network
+  create      Create a network
+  disconnect  Disconnect a container from a network
+  inspect     Display detailed information on one or more networks
+  ls          List networks
+  prune       Remove all unused networks
+  rm          Remove one or more networks
+
+Run 'docker network COMMAND --help' for more information on a command.
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network ls --help
+
+Usage:  docker network ls [OPTIONS]
+
+List networks
+
+Aliases:
+  docker network ls, docker network list
+
+Options:
+  -f, --filter filter   Provide filter values (e.g. "driver=bridge")
+      --format string   Format output using a custom template:
+                        'table':            Print output in table format with column headers (default)
+                        'table TEMPLATE':   Print output in table format using the given Go template
+                        'json':             Print in JSON format
+                        'TEMPLATE':         Print output using the given Go template.
+                        Refer to https://docs.docker.com/go/formatting/ for more information about formatting output with templates
+      --no-trunc        Do not truncate the output
+  -q, --quiet           Only display network IDs
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network ls       
+NETWORK ID     NAME        DRIVER    SCOPE
+35216bf691cf   bridge      bridge    local
+8f4dc6256e0d   host        host      local
+42fc8030ce68   mynetwork   bridge    local
+8735aa6a0362   none        null      local
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run --detach --name es1 --net mynetwork --network-alias search elasticsearch:2
+Unable to find image 'elasticsearch:2' locally
+2: Pulling from library/elasticsearch
+05d1a5232b46: Pull complete 
+5cee356eda6b: Pull complete 
+89d3385f0fd3: Pull complete 
+65dd87f6620b: Pull complete 
+78a183a01190: Pull complete 
+1a4499c85f97: Pull complete 
+2c9d39b4bfc1: Pull complete 
+1b1cec2222c9: Pull complete 
+59ff4ce9df68: Pull complete 
+1976bc3ee432: Pull complete 
+a27899b7a5b5: Pull complete 
+b0fc7d2c927a: Pull complete 
+6d94b96bbcd0: Pull complete 
+6f5bf40725fd: Pull complete 
+2bf2a528ae9a: Pull complete 
+Digest: sha256:41ed3a1a16b63de740767944d5405843db00e55058626c22838f23b413aa4a39
+Status: Downloaded newer image for elasticsearch:2
+8c9b09b5f91222969d524618d9a442a98079da90c3e72a8ebeb8dfe2ad0781a0
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run -d --name es2 --net mynetwork --network-alias search elasticsearch:2
+e45b0a863e5b6579765116b42f56841d4a544a697baf4872e950ebdd83d572bc
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container ls
+CONTAINER ID   IMAGE             COMMAND                  CREATED          STATUS          PORTS                NAMES
+e45b0a863e5b   elasticsearch:2   "/docker-entrypoint.…"   11 seconds ago   Up 9 seconds    9200/tcp, 9300/tcp   es2
+8c9b09b5f912   elasticsearch:2   "/docker-entrypoint.…"   16 seconds ago   Up 15 seconds   9200/tcp, 9300/tcp   es1
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run --rm --net mynetwork alpine nslookup search
+Unable to find image 'alpine:latest' locally
+latest: Pulling from library/alpine
+c6a83fedfae6: Pull complete 
+Digest: sha256:0a4eaa0eecf5f8c050e5bba433f58c052be7587ee8af3e8b3910ef9ab5fbe9f5
+Status: Downloaded newer image for alpine:latest
+Server:		127.0.0.11
+Address:	127.0.0.11:53
+
+Non-authoritative answer:
+
+Non-authoritative answer:
+Name:	search
+Address: 172.18.0.2
+Name:	search
+Address: 172.18.0.3
+
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run --rm --net mynetwork centos curl -s search:9200 | grep name
+Unable to find image 'centos:latest' locally
+latest: Pulling from library/centos
+a1d0c7532777: Pull complete 
+Digest: sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+Status: Downloaded newer image for centos:latest
+  "name" : "Charcoal",
+  "cluster_name" : "elasticsearch",
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run --rm --net mynetwork centos curl -s search:9200 | grep name
+  "name" : "Key",
+  "cluster_name" : "elasticsearch",
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run --rm --net mynetwork centos curl -s search:9200 | grep name
+  "name" : "Key",
+  "cluster_name" : "elasticsearch",
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run --rm --net mynetwork centos curl -s search:9200 | grep name
+  "name" : "Charcoal",
+  "cluster_name" : "elasticsearch",
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker stop es1 es2
+es1
+es2
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker rm es1 es2
+es1
+es2
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker network rm mynetwork
+mynetwork
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker rmi elasticsearch:2
+Untagged: elasticsearch:2
+Untagged: elasticsearch@sha256:41ed3a1a16b63de740767944d5405843db00e55058626c22838f23b413aa4a39
+Deleted: sha256:5e9d896dc62cb76d03fd48ef06c744d45fbd2098e3fc1752ad4604c8d35b14eb
+Deleted: sha256:4294eb6bb23d80f133dbd14bfcc4fdcd75487b29be50e1c0b96df3efb4c098d5
+Deleted: sha256:85345dc9d2d39ba5aa6cf924d5824e512c5fc61020acbdc9d558773685469881
+Deleted: sha256:9f511492e4f5d7b98f173d9d7d7e75c4d3d160e28967481530d10e1fe3f8c519
+Deleted: sha256:ceb19702d5203599d55498dbbff202abd2775d18ca0e273ccd1f16484da0816f
+Deleted: sha256:dd7c71ba95eefcee03087aad89e4e046c8b6d26f5da3908d49da5a75147e6d65
+Deleted: sha256:1ccc05345091bb39b170180859e4312e43432e1694ce1964e0fb4fc3548d4fd2
+Deleted: sha256:3ffda1330d17210a51b1e69f385339369edae86f2b481e3418756c853fff85f2
+Deleted: sha256:eb25282c86a6f048cf9c766b6456d074ce22952ace1573d090852e460d448a91
+Deleted: sha256:ace97896118c74c99d4555445966e9e16b7e7f7670fde53d33d9753b84f4247f
+Deleted: sha256:a9de2214d67d0d7bf40e88e646bb75e3a95cd21c614121449c2873ab4236f41c
+Deleted: sha256:0e3c6dece00c9e96b98787480de7c821a1cf7a7ac33883e0b6a386c2b22d285f
+Deleted: sha256:be985ef6c5ce96739cbe924702dc83fa1c05b0635178cf939985ead10ca4177f
+Deleted: sha256:54a32bd7a949afcfc50488df9a48db13f5bfc63c282a09db4aa2fb499012c21f
+Deleted: sha256:7d5f2843cac2368781293d71139c6c30fbb6b7029f6fd4424da858e7f2772875
+Deleted: sha256:b28ef0b6fef80faa25436bec0a1375214d9a23a91e9b75975bba3b2889f8504f
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container ls -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image --help
+
+Usage:  docker image COMMAND
+
+Manage images
+
+Commands:
+  build       Build an image from a Dockerfile
+  history     Show the history of an image
+  import      Import the contents from a tarball to create a filesystem image
+  inspect     Display detailed information on one or more images
+  load        Load an image from a tar archive or STDIN
+  ls          List images
+  prune       Remove unused images
+  pull        Download an image from a registry
+  push        Upload an image to a registry
+  rm          Remove one or more images
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+
+Run 'docker image COMMAND --help' for more information on a command.
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image ls --help
+
+Usage:  docker image ls [OPTIONS] [REPOSITORY[:TAG]]
+
+List images
+
+Aliases:
+  docker image ls, docker image list, docker images
+
+Options:
+  -a, --all             Show all images (default hides intermediate images)
+      --digests         Show digests
+  -f, --filter filter   Filter output based on conditions provided
+      --format string   Format output using a custom template:
+                        'table':            Print output in table format with column headers (default)
+                        'table TEMPLATE':   Print output in table format using the given Go template
+                        'json':             Print in JSON format
+                        'TEMPLATE':         Print output using the given Go template.
+                        Refer to https://docs.docker.com/go/formatting/ for more information about formatting output with templates
+      --no-trunc        Don't truncate output
+  -q, --quiet           Only show image IDs
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image ls       
+REPOSITORY   TAG       IMAGE ID       CREATED       SIZE
+alpine       latest    324bc02ae123   2 weeks ago   7.8MB
+centos       latest    5d0da3dc9764   2 years ago   231MB
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container prune -f
+Total reclaimed space: 0B
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image prune -a -f
+Deleted Images:
+untagged: alpine:latest
+untagged: alpine@sha256:0a4eaa0eecf5f8c050e5bba433f58c052be7587ee8af3e8b3910ef9ab5fbe9f5
+deleted: sha256:324bc02ae1231fd9255658c128086395d3fa0aedd5a41ab6b034fd649d1a9260
+deleted: sha256:78561cef0761903dd2f7d09856150a6d4fb48967a8f113f3e33d79effbf59a07
+untagged: centos:latest
+untagged: centos@sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+deleted: sha256:5d0da3dc976460b72c77d94c8a1ad043720b0416bfc16c52c45d4847e53fadb6
+deleted: sha256:74ddd0ec08fa43d09f32636ba91a0a3053b02cb4627c35051aff89f853606b59
+
+Total reclaimed space: 239.1MB
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image ls          
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+```
+
+#### Explanations of Steps
+```zsh
+# List all networks to confirm 'mynetwork' was created
+docker network ls
+
+# Run the first container from the elasticsearch:2 image, naming it 'es1', attaching it to 'mynetwork', 
+# and giving it a network alias 'search'
+docker run -d --name es1 --net mynetwork --network-alias search elasticsearch:2
+
+# Run the second container from the elasticsearch:2 image, naming it 'es2', attaching it to 'mynetwork', 
+# and giving it a network alias 'search'
+docker run -d --name es2 --net mynetwork --network-alias search elasticsearch:2
+
+# List all running containers to confirm both 'es1' and 'es2' are up and running
+docker container ls
+
+# Run an Alpine container to perform an nslookup for the 'search' alias on 'mynetwork' to see if both 'es1' and 'es2' respond
+docker run --rm --net mynetwork alpine nslookup search
+
+# Run a CentOS container to curl 'search:9200' on 'mynetwork' multiple times to see both 'es1' and 'es2' respond
+docker run --rm --net mynetwork centos curl -s search:9200 | grep name
+docker run --rm --net mynetwork centos curl -s search:9200 | grep name
+docker run --rm --net mynetwork centos curl -s search:9200 | grep name
+
+# The following is cleanup
+
+# Stop the 'es1' and 'es2' containers
+docker stop es1 es2
+
+# Remove the 'es1' and 'es2' containers
+docker rm es1 es2
+
+# Remove the 'mynetwork' virtual network
+docker network rm mynetwork
+
+# Remove the 'elasticsearch:2' image
+docker rmi elasticsearch:2
+
+# Optionally, prune unused Docker objects
+docker container prune -f
+docker image prune -a -f
+```
