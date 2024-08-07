@@ -494,3 +494,148 @@ docker exec -it new_nginx ping my_nginx
     * ubuntu: `apt -get update && apt -get install curl`
     * centos: `yum update curl`
 - Check `curl --version`
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run -it --rm centos:7 /bin/bash
+Unable to find image 'centos:7' locally
+7: Pulling from library/centos
+2d473b07cdd5: Pull complete 
+Digest: sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+Status: Downloaded newer image for centos:7
+[root@2211c8e7c5b3 /]# yum update curl
+Loaded plugins: fastestmirror, ovl
+Determining fastest mirrors
+Could not retrieve mirrorlist http://mirrorlist.centos.org/?release=7&arch=x86_64&repo=os&infra=container error was
+14: curl#52 - "Empty reply from server"
+
+
+ One of the configured repositories failed (Unknown),
+ and yum doesn't have enough cached data to continue. At this point the only
+ safe thing yum can do is fail. There are a few ways to work "fix" this:
+
+     1. Contact the upstream for the repository and get them to fix the problem.
+
+     2. Reconfigure the baseurl/etc. for the repository, to point to a working
+        upstream. This is most often useful if you are using a newer
+        distribution release than is supported by the repository (and the
+        packages for the previous distribution release still work).
+
+     3. Run the command with the repository temporarily disabled
+            yum --disablerepo=<repoid> ...
+
+     4. Disable the repository permanently, so yum won't use it by default. Yum
+        will then just ignore the repository until you permanently enable it
+        again or use --enablerepo for temporary usage:
+
+            yum-config-manager --disable <repoid>
+        or
+            subscription-manager repos --disable=<repoid>
+
+     5. Configure the failing repository to be skipped, if it is unavailable.
+        Note that yum will try to contact the repo. when it runs most commands,
+        so will have to try and fail each time (and thus. yum will be be much
+        slower). If it is a very temporary problem though, this is often a nice
+        compromise:
+
+            yum-config-manager --save --setopt=<repoid>.skip_if_unavailable=true
+
+Cannot find a valid baseurl for repo: base/7/x86_64
+[root@2211c8e7c5b3 /]# curl --version
+curl 7.29.0 (x86_64-redhat-linux-gnu) libcurl/7.29.0 NSS/3.44 zlib/1.2.7 libidn/1.28 libssh2/1.8.0
+Protocols: dict file ftp ftps gopher http https imap imaps ldap ldaps pop3 pop3s rtsp scp sftp smtp smtps telnet tftp 
+Features: AsynchDNS GSS-Negotiate IDN IPv6 Largefile NTLM NTLM_WB SSL libz unix-sockets 
+[root@2211c8e7c5b3 /]# exit
+exit
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run -it --rm ubuntu:14.04 /bin/bash
+Unable to find image 'ubuntu:14.04' locally
+14.04: Pulling from library/ubuntu
+2e6e20c8e2e6: Pull complete 
+0551a797c01d: Pull complete 
+512123a864da: Pull complete 
+Digest: sha256:64483f3496c1373bfd55348e88694d1c4d0c9b660dee6bfef5e12f43b9933b30
+Status: Downloaded newer image for ubuntu:14.04
+root@47c18b1abc63:/# apt-get update && apt-get install -y curl
+Ign http://archive.ubuntu.com trusty InRelease                           
+Get:1 http://security.ubuntu.com trusty-security InRelease [56.5 kB]
+Get:2 http://archive.ubuntu.com trusty-updates InRelease [56.5 kB]
+Get:3 http://security.ubuntu.com trusty-security/main amd64 Packages [877 kB]
+Get:4 http://archive.ubuntu.com trusty-backports InRelease [65.9 kB]           
+Get:5 https://esm.ubuntu.com trusty-infra-security InRelease                   
+Hit http://archive.ubuntu.com trusty Release.gpg                               
+Get:6 https://esm.ubuntu.com trusty-infra-updates InRelease
+Get:7 http://archive.ubuntu.com trusty-updates/main amd64 Packages [1460 kB]   
+Get:8 https://esm.ubuntu.com trusty-infra-security/main amd64 Packages    
+Get:9 http://security.ubuntu.com trusty-security/restricted amd64 Packages [24.6 kB]
+Get:10 http://security.ubuntu.com trusty-security/universe amd64 Packages [489 kB]
+Get:11 http://security.ubuntu.com trusty-security/multiverse amd64 Packages [6133 B]
+Get:12 http://archive.ubuntu.com trusty-updates/restricted amd64 Packages [28.8 kB]
+Get:13 http://archive.ubuntu.com trusty-updates/universe amd64 Packages [883 kB]
+Get:14 https://esm.ubuntu.com trusty-infra-updates/main amd64 Packages
+Get:15 http://archive.ubuntu.com trusty-updates/multiverse amd64 Packages [21.7 kB]
+Get:16 http://archive.ubuntu.com trusty-backports/main amd64 Packages [14.7 kB]
+Get:17 http://archive.ubuntu.com trusty-backports/restricted amd64 Packages [40 B]
+Get:18 http://archive.ubuntu.com trusty-backports/universe amd64 Packages [52.5 kB]
+Get:19 http://archive.ubuntu.com trusty-backports/multiverse amd64 Packages [1392 B]
+Hit http://archive.ubuntu.com trusty Release                                   
+Get:20 http://archive.ubuntu.com trusty/main amd64 Packages [1743 kB]          
+Get:21 http://archive.ubuntu.com trusty/restricted amd64 Packages [16.0 kB]    
+Get:22 http://archive.ubuntu.com trusty/universe amd64 Packages [7589 kB]      
+Get:23 http://archive.ubuntu.com trusty/multiverse amd64 Packages [169 kB]     
+Fetched 14.4 MB in 10s (1406 kB/s)                                             
+Reading package lists... Done
+Reading package lists... Done
+Building dependency tree       
+Reading state information... Done
+The following extra packages will be installed:
+  libcurl3
+The following NEW packages will be installed:
+  curl libcurl3
+0 upgraded, 2 newly installed, 0 to remove and 1 not upgraded.
+Need to get 297 kB of archives.
+After this operation, 878 kB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu/ trusty-updates/main libcurl3 amd64 7.35.0-1ubuntu2.20 [173 kB]
+Get:2 http://archive.ubuntu.com/ubuntu/ trusty-updates/main curl amd64 7.35.0-1ubuntu2.20 [123 kB]
+Fetched 297 kB in 2s (143 kB/s)
+Selecting previously unselected package libcurl3:amd64.
+(Reading database ... 12097 files and directories currently installed.)
+Preparing to unpack .../libcurl3_7.35.0-1ubuntu2.20_amd64.deb ...
+Unpacking libcurl3:amd64 (7.35.0-1ubuntu2.20) ...
+Selecting previously unselected package curl.
+Preparing to unpack .../curl_7.35.0-1ubuntu2.20_amd64.deb ...
+Unpacking curl (7.35.0-1ubuntu2.20) ...
+Setting up libcurl3:amd64 (7.35.0-1ubuntu2.20) ...
+Setting up curl (7.35.0-1ubuntu2.20) ...
+Processing triggers for libc-bin (2.19-0ubuntu6.15) ...
+root@47c18b1abc63:/# curl --version
+curl 7.35.0 (x86_64-pc-linux-gnu) libcurl/7.35.0 OpenSSL/1.0.1f zlib/1.2.8 libidn/1.28 librtmp/2.3
+Protocols: dict file ftp ftps gopher http https imap imaps ldap ldaps pop3 pop3s rtmp rtsp smtp smtps telnet tftp 
+Features: AsynchDNS GSS-Negotiate IDN IPv6 Largefile NTLM NTLM_WB SSL libz TLS-SRP 
+root@47c18b1abc63:/# exit
+exit
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container ls
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container ls -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container ps   
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container ps -a
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container prune -f
+Total reclaimed space: 0B
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image prune -a -f
+Deleted Images:
+untagged: centos:7
+untagged: centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+deleted: sha256:eeb6ee3f44bd0b5103bb561b4c16bcb82328cfe5809ab675bb17ab3a16c517c9
+deleted: sha256:174f5685490326fc0a1c0f5570b8663732189b327007e47ff13d2ca59673db02
+untagged: ubuntu:14.04
+untagged: ubuntu@sha256:64483f3496c1373bfd55348e88694d1c4d0c9b660dee6bfef5e12f43b9933b30
+deleted: sha256:13b66b487594a1f2b75396013bc05d29d9f527852d96c5577cc4f187559875d0
+deleted: sha256:e08f4f554d8df6b04f441fcdfe207b6314d3c709daa2b1ef66f79bbfb529b8c4
+deleted: sha256:c28d0c854fd56736ef4456e3c1c4276a28159751dc13fd1b340bd38d69473f7e
+deleted: sha256:f2fa9f4cf8fd0a521d40e34492b522cee3f35004047e617c75fadeb8bfd1e6b7
+
+Total reclaimed space: 400.4MB
+```
