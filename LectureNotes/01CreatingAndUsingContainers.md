@@ -639,3 +639,137 @@ deleted: sha256:f2fa9f4cf8fd0a521d40e34492b522cee3f35004047e617c75fadeb8bfd1e6b7
 
 Total reclaimed space: 400.4MB
 ```
+#### Steps:
+
+1. **Use different Linux distro containers to check `curl` CLI tool version**:
+    - This helps ensure that `curl` behaves consistently across different environments.
+
+2. **Use two different terminal windows to start 'bash' in both `centos:7` and `ubuntu:14.04`, using `-it`**:
+    - Using `-it` allows you to interact with the container's shell directly.
+    - Example command for CentOS:
+        ```sh
+        docker run -it --rm centos:7 /bin/bash
+        ```
+    - Example command for Ubuntu:
+        ```sh
+        docker run -it --rm ubuntu:14.04 /bin/bash
+        ```
+
+3. **Learn the `docker container --rm` option so you can save cleanup**:
+    - The `--rm` option automatically removes the container when it exits, reducing manual cleanup.
+
+4. **Ensure `curl` is installed and on the latest version for that distro**:
+    - For Ubuntu:
+        ```sh
+        apt-get update && apt-get install -y curl
+        ```
+    - For CentOS:
+        ```sh
+        yum update curl
+        ```
+
+5. **Check `curl --version`**:
+    - Run this command in each container to verify the installed version of `curl`.
+
+#### Example Execution:
+
+1. **Start a CentOS 7 container**:
+    ```zsh
+    edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run -it --rm centos:7 /bin/bash
+    Unable to find image 'centos:7' locally
+    7: Pulling from library/centos
+    2d473b07cdd5: Pull complete 
+    Digest: sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+    Status: Downloaded newer image for centos:7
+    ```
+
+2. **Update `curl` in CentOS container**:
+    ```sh
+    [root@2211c8e7c5b3 /]# yum update curl
+    Loaded plugins: fastestmirror, ovl
+    Determining fastest mirrors
+    Could not retrieve mirrorlist http://mirrorlist.centos.org/?release=7&arch=x86_64&repo=os&infra=container error was
+    14: curl#52 - "Empty reply from server"
+
+    (Additional output and error messages may appear here)
+
+    [root@2211c8e7c5b3 /]# curl --version
+    curl 7.29.0 (x86_64-redhat-linux-gnu) libcurl/7.29.0 NSS/3.44 zlib/1.2.7 libidn/1.28 libssh2/1.8.0
+    Protocols: dict file ftp ftps gopher http https imap imaps ldap ldaps pop3 pop3s rtsp scp sftp smtp smtps telnet tftp 
+    Features: AsynchDNS GSS-Negotiate IDN IPv6 Largefile NTLM NTLM_WB SSL libz unix-sockets 
+    ```
+
+3. **Exit the CentOS container**:
+    ```sh
+    [root@2211c8e7c5b3 /]# exit
+    exit
+    ```
+
+4. **Start an Ubuntu 14.04 container**:
+    ```zsh
+    edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker run -it --rm ubuntu:14.04 /bin/bash
+    Unable to find image 'ubuntu:14.04' locally
+    14.04: Pulling from library/ubuntu
+    2e6e20c8e2e6: Pull complete 
+    0551a797c01d: Pull complete 
+    512123a864da: Pull complete 
+    Digest: sha256:64483f3496c1373bfd55348e88694d1c4d0c9b660dee6bfef5e12f43b9933b30
+    Status: Downloaded newer image for ubuntu:14.04
+    ```
+
+5. **Update and install `curl` in the Ubuntu container**:
+    ```sh
+    root@47c18b1abc63:/# apt-get update && apt-get install -y curl
+    (Output from the update and install commands)
+    root@47c18b1abc63:/# curl --version
+    curl 7.35.0 (x86_64-pc-linux-gnu) libcurl/7.35.0 OpenSSL/1.0.1f zlib/1.2.8 libidn/1.28 librtmp/2.3
+    Protocols: dict file ftp ftps gopher http https imap imaps ldap ldaps pop3 pop3s rtmp rtsp smtp smtps telnet tftp 
+    Features: AsynchDNS GSS-Negotiate IDN IPv6 Largefile NTLM NTLM_WB SSL libz TLS-SRP 
+    ```
+
+6. **Exit the Ubuntu container**:
+    ```sh
+    root@47c18b1abc63:/# exit
+    exit
+    ```
+
+#### Cleanup:
+
+After completing the testing, you can clean up the Docker environment to free up space:
+
+1. **List running containers (should be empty if `--rm` was used)**:
+    ```zsh
+    edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container ls
+    CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+    ```
+
+2. **List all containers (should be empty if `--rm` was used)**:
+    ```zsh
+    edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container ls -a
+    CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+    ```
+
+3. **Remove all stopped containers**:
+    ```zsh
+    edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker container prune -f
+    Total reclaimed space: 0B
+    ```
+
+4. **Remove all unused images**:
+    ```zsh
+    edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image prune -a -f
+    Deleted Images:
+    untagged: centos:7
+    untagged: centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+    deleted: sha256:eeb6ee3f44bd0b5103bb561b4c16bcb82328cfe5809ab675bb17ab3a16c517c9
+    deleted: sha256:174f5685490326fc0a1c0f5570b8663732189b327007e47ff13d2ca59673db02
+    untagged: ubuntu:14.04
+    untagged: ubuntu@sha256:64483f3496c1373bfd55348e88694d1c4d0c9b660dee6bfef5e12f43b9933b30
+    deleted: sha256:13b66b487594a1f2b75396013bc05d29d9f527852d96c5577cc4f187559875d0
+    deleted: sha256:e08f4f554d8df6b04f441fcdfe207b6314d3c709daa2b1ef66f79bbfb529b8c4
+    deleted: sha256:c28d0c854fd56736ef4456e3c1c4276a28159751dc13fd1b340bd38d69473f7e
+    deleted: sha256:f2fa9f4cf8fd0a521d40e34492b522cee3f35004047e617c75fadeb8bfd1e6b7
+    Total reclaimed space: 400.4MB
+    ```
+
+By following these steps, you can test the `curl` CLI tool on different Linux distributions using Docker containers and clean up your environment afterward.
