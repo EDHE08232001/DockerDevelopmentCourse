@@ -230,3 +230,56 @@ Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
 Aliases:
   docker image tag, docker tag
 ```
+
+Retagging and Pushing Example:
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker pull nginx
+Using default tag: latest
+latest: Pulling from library/nginx
+e4fff0779e6d: Pull complete 
+2a0cb278fd9f: Pull complete 
+7045d6c32ae2: Pull complete 
+03de31afb035: Pull complete 
+0f17be8dcff2: Pull complete 
+14b7e5e8f394: Pull complete 
+23fa5a7b99a6: Pull complete 
+Digest: sha256:447a8665cc1dab95b1ca778e162215839ccbb9189104c79d7ec3a81e14577add
+Status: Downloaded newer image for nginx:latest
+docker.io/library/nginx:latest
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview nginx
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image list
+REPOSITORY   TAG       IMAGE ID       CREATED      SIZE
+nginx        latest    5ef79149e0ec   6 days ago   188MB
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image tag --help
+
+Usage:  docker image tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+
+Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+
+Aliases:
+  docker image tag, docker tag
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image tag nginx edhe08232001/nginx
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image list                        
+REPOSITORY           TAG       IMAGE ID       CREATED      SIZE
+nginx                latest    5ef79149e0ec   6 days ago   188MB
+edhe08232001/nginx   latest    5ef79149e0ec   6 days ago   188MB
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image push edhe08232001/nginx     
+Using default tag: latest
+The push refers to repository [docker.io/edhe08232001/nginx]
+5f0272c6e96d: Mounted from library/nginx 
+f4f00eaedec7: Mounted from library/nginx 
+55e54df86207: Mounted from library/nginx 
+ec1a2ca4ac87: Mounted from library/nginx 
+8b87c0c66524: Mounted from library/nginx 
+72db5db515fd: Mounted from library/nginx 
+9853575bc4f9: Mounted from library/nginx 
+latest: digest: sha256:127262f8c4c716652d0e7863bba3b8c45bc9214a57d13786c854272102f7c945 size: 1778
+```
