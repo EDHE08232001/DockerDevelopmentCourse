@@ -218,6 +218,8 @@ By leveraging Docker's layered architecture and commands like `history` and `ins
 
 ## Image Tagging and Pushing To Docker Hub
 
+In Docker, tagging an image is a crucial step for version control and organization. Tags act as pointers to specific image versions, making it easier to manage and deploy images across various environments. This section covers the basic commands for tagging Docker images and pushing them to Docker Hub.
+
 Tagging:
 
 ```zsh
@@ -283,3 +285,21 @@ ec1a2ca4ac87: Mounted from library/nginx
 9853575bc4f9: Mounted from library/nginx 
 latest: digest: sha256:127262f8c4c716652d0e7863bba3b8c45bc9214a57d13786c854272102f7c945 size: 1778
 ```
+
+In this example, here's what happens:
+
+1. **Pulling the Image:** You downloaded (pulled) the `nginx:latest` image from the official `nginx` repository on Docker Hub. This image consists of a set of layers that make up the `nginx` software.
+
+2. **Retagging:** When you retagged the image using `docker image tag nginx edhe08232001/nginx`, you created a new tag (`edhe08232001/nginx:latest`) that points to the same image layers as the original `nginx:latest` image. This tag now exists locally on your machine.
+
+3. **Pushing:** When you pushed the `edhe08232001/nginx:latest` tag to your Docker Hub repository, Docker checked if the image layers already existed on Docker Hub. Since you pulled the image from the official `nginx` repository and didn't make any changes, those layers likely already exist on Docker Hub.
+
+   - Docker doesn't re-upload the layers that are already present in Docker Hub. Instead, it just adds your new tag (`edhe08232001/nginx:latest`) to point to those existing layers in your personal Docker Hub repository.
+
+### Result
+
+- **New Tag:** Your repository (`edhe08232001/nginx`) now contains the tag `latest`, which references the exact same image layers as the original `nginx:latest` image in the official `nginx` repository.
+
+- **No Duplication:** The image layers aren't duplicated or copied anew; only the tag is added to your repository, pointing to the same content that is already present on Docker Hub.
+
+So, in essence, by retagging and pushing, you have created a new reference under your Docker Hub account without duplicating the image content. The image is not new in terms of its contents—it's simply a new label (tag) that points to an existing set of image layers on Docker Hub.
