@@ -66,6 +66,40 @@ In the example above:
 
 4. **Image Digest**: Each image has a unique digest (a SHA256 hash) that ensures its integrity and consistency across different environments. The digest is displayed after pulling an image.
 
+### Another Example
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker pull nginx:latest
+latest: Pulling from library/nginx
+e4fff0779e6d: Pull complete 
+2a0cb278fd9f: Pull complete 
+7045d6c32ae2: Pull complete 
+03de31afb035: Pull complete 
+0f17be8dcff2: Pull complete 
+14b7e5e8f394: Pull complete 
+23fa5a7b99a6: Pull complete 
+Digest: sha256:447a8665cc1dab95b1ca778e162215839ccbb9189104c79d7ec3a81e14577add
+Status: Downloaded newer image for nginx:latest
+docker.io/library/nginx:latest
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview nginx:latest
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker pull nginx:mainline
+mainline: Pulling from library/nginx
+Digest: sha256:447a8665cc1dab95b1ca778e162215839ccbb9189104c79d7ec3a81e14577add
+Status: Downloaded newer image for nginx:mainline
+docker.io/library/nginx:mainline
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview nginx:mainline
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image list
+REPOSITORY   TAG        IMAGE ID       CREATED      SIZE
+nginx        latest     5ef79149e0ec   6 days ago   188MB
+nginx        mainline   5ef79149e0ec   6 days ago   188MB
+```
+
 Understanding the difference between tags and image versions allows you to manage your Docker images more efficiently, reducing unnecessary downloads and redundancy.
 
 ## Image Layers and the Image Cache: A Deeper Look
@@ -181,3 +215,18 @@ edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image inspect ngin
 ### Summary of Docker Layers and Mechanisms
 
 By leveraging Docker's layered architecture and commands like `history` and `inspect`, you can better manage and optimize container images. Understanding these concepts also helps in debugging issues related to image size, build times, and deployment consistency.
+
+## Image Tagging and Pushing To Docker Hub
+
+Tagging:
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image tag --help
+
+Usage:  docker image tag SOURCE_IMAGE[:TAG] TARGET_IMAGE[:TAG]
+
+Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+
+Aliases:
+  docker image tag, docker tag
+```
