@@ -1050,16 +1050,16 @@ This command runs a CentOS container, which then uses `curl` to make an HTTP req
 
 This is typically done to check if the `elasticsearch` service is running properly and to verify which container (`es1` or `es2`) responded to the request. Elasticsearch responses often include fields like `"name": "some-container-name"`, so `grep name` helps to extract and display that information.
 
-### Explain Command `docker run --rm --net mynetwork centos curl -s search:9200 | grep name`
+#### Explain Command `docker run --rm --net mynetwork centos curl -s search:9200 | grep name`
 
-Certainly! Let’s break down the `docker run` command with all its flags, options, and arguments:
+Let’s break down the `docker run` command with all its flags, options, and arguments:
 
-#### Full Command
+##### Full Command
 ```bash
 docker run --rm --net mynetwork centos curl -s search:9200 | grep name
 ```
 
-#### Breakdown of the Command
+##### Breakdown of the Command
 
 ###### 1. `docker run`
 This command starts a new container from a specified Docker image and executes a command inside it. After the command completes, the container stops.
@@ -1101,5 +1101,5 @@ This part of the command is a standard Unix/Linux pipeline operation, not specif
 - **Argument:** `name`
   - **Description:** The pattern `grep` is searching for. It will filter the lines of the `curl` response and only display those that contain the word "name". This is useful for extracting specific information from the Elasticsearch JSON response, which typically includes a field named `"name"` that indicates the name of the node or container responding to the request.
 
-#### Summary
+##### Summary
 The entire command starts a temporary CentOS container, attaches it to the `mynetwork` network, and makes an HTTP request to the `search` alias at port 9200. The response is filtered to show only lines containing the word "name," which helps identify which Elasticsearch container (`es1` or `es2`) responded to the request. After execution, the container is automatically removed due to the `--rm` flag.
