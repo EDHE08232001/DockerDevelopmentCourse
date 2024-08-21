@@ -1,20 +1,22 @@
-# Containers Images
+# Container Images
 
-## What is in an image? (And what isn't)
-- **App binaries**
-- **Metadata** about the image data and how to run the image
+## What Constitutes an Image? (And What Doesn't)
+
+- **App Binaries**: The core executable files for your application.
+- **Metadata**: Information about the image, including how it should be run.
 - **Official Definition**:  
-  "An image is an ordered collection of root filesystem changes and the corresponding execution parameters for use within a container runtime."
-- **Not a complete OS**:  
-  No kernel (since the host provides it), no kernel modules (e.g., drivers)
-- **Small as one file (your app binary)** like golang static binary
-- **Big** as a Ubuntu distro with apt, and apache, PHP, and more installed
+  "An image is an ordered collection of root filesystem changes and the corresponding execution parameters intended for use within a container runtime."
+- **Not a Full Operating System**:  
+  An image does not include a kernel, as the host system's kernel is used. There are also no kernel modules, such as drivers.
+- **Size Variation**:  
+  - Images can be as small as a single file, like a Golang static binary.
+  - They can also be as large as a full Ubuntu distribution with additional software like Apache, PHP, and more.
 
 ## Docker Tags and Images
 
-In Docker, images are essential for creating containers. Each image can have one or more tags that refer to specific versions or instances of that image. Tags are used to differentiate between multiple versions of the same image, such as a `latest` tag for the most recent version and version-specific tags like `1.27.1`.
+In Docker, images serve as the foundation for creating containers. Each image can have one or more tags that refer to specific versions or instances of that image. Tags are essential for differentiating between multiple versions of the same image. For example, the `latest` tag refers to the most recent version, while version-specific tags like `1.27.1` indicate particular versions.
 
-### Example of Working with Docker Images and Tags
+### Working with Docker Images and Tags: An Example
 
 ```zsh
 # List all Docker images currently available on your system.
@@ -36,7 +38,7 @@ Digest: sha256:447a8665cc1dab95b1ca778e162215839ccbb9189104c79d7ec3a81e14577add
 Status: Downloaded newer image for nginx:latest
 docker.io/library/nginx:latest
 
-# Next steps suggestion by Docker after pulling the image.
+# Docker suggests a next step after pulling the image.
 What's next:
     View a summary of image vulnerabilities and recommendations → docker scout quickview nginx
 
@@ -47,41 +49,44 @@ Digest: sha256:1540e37eebb9abc5afa4256de1bade6542d50bf69b61b1dd855cb7804aaaf444
 Status: Downloaded newer image for nginx:1.27.1
 docker.io/library/nginx:1.27.1
 
-# Next steps suggestion by Docker after pulling the image.
+# Docker suggests a next step after pulling the image.
 What's next:
     View a summary of image vulnerabilities and recommendations → docker scout quickview nginx:1.27.1
 ```
 
 ### Explanation
 
-In the above example:
+In the example above:
 
-1. **Pulling the Latest Image**: The command `docker pull nginx` pulls the latest version of the nginx image from Docker Hub. The `latest` tag is used by default if no tag is specified. 
+1. **Pulling the Latest Image**: The command `docker pull nginx` retrieves the latest version of the nginx image from Docker Hub. If no tag is specified, Docker uses the `latest` tag by default.
 
-2. **Pulling a Specific Version**: The command `docker pull nginx:1.27.1` pulls a specific version of the nginx image, identified by the tag `1.27.1`. This is useful when you want to ensure consistency in your environment by always using a specific version of an image.
+2. **Pulling a Specific Version**: The command `docker pull nginx:1.27.1` retrieves a specific version of the nginx image, identified by the `1.27.1` tag. This approach is useful for maintaining consistency across environments by always using a specific image version.
 
-3. **Redundancy in Pulling**: Both the `nginx:latest` and `nginx:1.27.1` refer to the same image version in this case, meaning there is no need to pull the second image if you have already pulled the latest one. Docker will recognize that the image layers are identical and won't download them again.
+3. **Redundancy in Pulling**: Both `nginx:latest` and `nginx:1.27.1` refer to the same image version in this case. Docker will recognize that the image layers are identical and avoid downloading them again, thus preventing unnecessary redundancy.
 
-4. **Image Digest**: Each image has a unique digest (a SHA256 hash) that ensures its integrity and consistency across different environments. This digest is displayed after pulling an image.
+4. **Image Digest**: Each image has a unique digest (a SHA256 hash) that ensures its integrity and consistency across different environments. The digest is displayed after pulling an image.
 
-By understanding the difference between tags and image versions, you can better manage your Docker images and avoid unnecessary downloads and redundancies.
+Understanding the difference between tags and image versions allows you to manage your Docker images more efficiently, reducing unnecessary downloads and redundancy.
 
-## Images and Their Layers: Discover the Image Cache
-1. Image Layers
-2. Union File System
-3. `history` and `inspect` command
-4. copy on write
+## Image Layers and the Image Cache: A Deeper Look
 
-Command: `docker image history <image>`, use this command to view the history of a specific Docker image
+1. **Image Layers**: Docker images are built in layers, where each layer represents a change or addition to the image.
+2. **Union File System**: Layers are combined using a union file system, which allows for efficient storage and retrieval.
+3. **History and Inspect Commands**: Use `docker image history <image>` to view the history of an image.
+4. **Copy-on-Write**: When an image is modified, only the changes are stored, thanks to Docker's copy-on-write mechanism.
+
+### Using the `docker image history` Command
 
 ```zsh
 edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image history nginx:latest
 Error response from daemon: No such image: nginx:latest
 ```
 
-In this example, the command attempts to retrieve the history of the nginx:latest image. The error indicates that the image does not exist locally.
+In this example, the command attempts to retrieve the history of the `nginx:latest` image. The error indicates that the image does not exist locally.
 
-### Using the history Command with Options
+**Note**: Every new image begins with a base layer called "scratch." Any subsequent changes to the image create new layers.
+
+### Exploring `docker image history` Options
 
 ```zsh
 edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image history --help
@@ -104,4 +109,3 @@ Options:
       --no-trunc        Don't truncate output
   -q, --quiet           Only show image IDs
 ```
-
