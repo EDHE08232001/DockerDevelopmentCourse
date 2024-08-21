@@ -109,3 +109,19 @@ Options:
       --no-trunc        Don't truncate output
   -q, --quiet           Only show image IDs
 ```
+
+### Using the `docker image inspect` Command
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image inspect --help
+
+Usage:  docker image inspect [OPTIONS] IMAGE [IMAGE...]
+
+Display detailed information on one or more images
+
+Options:
+  -f, --format string   Format output using a custom template:
+                        'json':             Print in JSON format
+                        'TEMPLATE':         Print output using the given Go template.
+                        Refer to https://docs.docker.com/go/formatting/ for more information about formatting output with templates
+```
