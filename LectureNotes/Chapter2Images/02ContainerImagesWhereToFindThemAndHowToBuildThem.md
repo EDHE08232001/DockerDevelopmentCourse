@@ -438,3 +438,83 @@ CMD ["nginx", "-g", "daemon off;"]
 # required: run this command when container is launched
 # only one CMD allowed, so if there are multiple, last one wins
 ```
+
+A **Dockerfile** is a script that contains a series of instructions on how to build a Docker image. Each instruction in the Dockerfile adds a layer to the image, and when the instructions are completed, you get a final Docker image that can be deployed as a container.
+
+### Example Dockerfile Breakdown
+
+Here’s a detailed explanation of the provided Dockerfile:
+
+```Dockerfile
+# Base Image
+FROM debian:bookworm-slim
+```
+
+- **FROM**: The `FROM` instruction initializes a new build stage and sets the base image for subsequent instructions. All Dockerfiles must start with a `FROM` instruction. In this example, the base image is `debian:bookworm-slim`, a minimal version of Debian Linux. Using a lightweight base image helps reduce the final image size.
+
+```Dockerfile
+LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
+```
+
+- **LABEL**: The `LABEL` instruction adds metadata to the image. In this case, it provides information about the maintainer of the Dockerfile, which can be useful for documentation and future reference.
+
+```Dockerfile
+ENV NGINX_VERSION   1.25.3
+ENV NJS_VERSION     0.8.2
+ENV PKG_RELEASE     1~bookworm
+```
+
+- **ENV**: The `ENV` instruction sets environment variables that will be available in subsequent instructions and when the container is running. Here, `NGINX_VERSION`, `NJS_VERSION`, and `PKG_RELEASE` are defined, which are later used in the `RUN` command to ensure the correct versions of NGINX and its related packages are installed.
+
+```Dockerfile
+RUN set -x \
+# create nginx user/group first, to be consistent throughout docker variants
+    && groupadd --system --gid 101 nginx \
+    && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx \
+    && apt-get update \
+    && apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates \
+    ...
+    && ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+    && mkdir /docker-entrypoint.d
+```
+
+- **RUN**: The `RUN` instruction executes commands in a new layer on top of the current image and commits the results. It’s often used to install packages, create files or directories, and configure the environment. 
+
+  In this example:
+  - It starts with `set -x`, which makes the shell print each command before executing it, useful for debugging.
+  - It creates a system group and user for `nginx` to ensure that the processes run with non-root privileges.
+  - It installs necessary packages (`gnupg1`, `ca-certificates`) and retrieves a GPG key to verify the NGINX packages.
+  - Depending on the system architecture, it either directly installs pre-built NGINX packages or compiles them from source.
+
+  The final steps forward the NGINX logs to Docker’s log collector and create a directory for additional entry-point scripts.
+
+```Dockerfile
+EXPOSE 80
+```
+
+- **EXPOSE**: The `EXPOSE` instruction informs Docker that the container will listen on the specified network ports at runtime. Here, port `80` is exposed, which is the default HTTP port for NGINX. This instruction doesn’t actually publish the port on the host; you’ll need to use the `-p` flag at runtime to do so.
+
+```Dockerfile
+STOPSIGNAL SIGQUIT
+```
+
+- **STOPSIGNAL**: This instruction sets the system call signal that will be sent to the container to initiate a graceful shutdown. In this example, `SIGQUIT` is used, which tells NGINX to quit immediately and shut down gracefully.
+
+```Dockerfile
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+- **CMD**: The `CMD` instruction provides defaults for an executing container. In this case, it tells Docker to start NGINX with the `-g "daemon off;"` flag, which runs NGINX in the foreground. Only one `CMD` instruction is allowed in a Dockerfile; if you have multiple, the last one will be used.
+
+### Summary of Dockerfile Structure
+
+- **FROM**: Defines the base image.
+- **LABEL**: Adds metadata to the image.
+- **ENV**: Sets environment variables.
+- **RUN**: Executes commands to install software, set up the environment, and configure the system.
+- **EXPOSE**: Documents the ports on which the container listens.
+- **STOPSIGNAL**: Specifies how the container should be stopped.
+- **CMD**: Defines the default command to run when the container starts.
+
+This structure forms a repeatable and transparent process for creating Docker images. By understanding each part of the Dockerfile, you can customize and optimize your images for various use cases.
