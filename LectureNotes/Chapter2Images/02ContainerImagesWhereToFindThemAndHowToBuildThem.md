@@ -705,3 +705,115 @@ This command provides a summary of security issues and suggestions for improving
 - docker rmi: Removes images by ID.
 - $(docker images -q): This returns a list of image IDs.
 - -f (or --force): Forces the removal of the images, even if they are being used by containers.
+
+## Extending Official Images
+
+This shows how can we extend/change an official image from docker hub
+
+```Dockerfile
+FROM nginx:latest
+# highly recommend you always pin version for anything beyond dev/learn
+
+WORKDIR /usr/share/nginx/html
+# changing working directory to root of nginx webhost
+# using WORKDIR is prefered to using `RUN cd /some/path`
+
+COPY index.html index.html
+
+# I do not have to specify any EXPOSE or CMD because they in my FROM
+```
+
+### A Better Example
+
+#### Original Dockerfile
+
+```Dockerfile
+# Base Image
+FROM nginx:1.21.0
+
+# Set the working directory
+WORKDIR /usr/share/nginx/html
+
+# Copy a simple HTML file to the container
+COPY index.html /usr/share/nginx/html/index.html
+
+# Expose port 80 (default for nginx)
+EXPOSE 80
+
+# Run nginx in the foreground
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+This Dockerfile uses the nginx:1.21.0 image as the base, sets the working directory to the default web root of Nginx, copies an index.html file into that directory, and then exposes port 80, which is the default port for HTTP traffic. The CMD instruction tells Docker to run Nginx in the foreground.
+
+#### Extended Dockerfile
+
+```Dockerfile
+# Extend the official Nginx image
+FROM nginx:1.21.0
+
+# Set the working directory
+WORKDIR /usr/share/nginx/html
+
+# Copy additional static files
+COPY index.html /usr/share/nginx/html/index.html
+COPY about.html /usr/share/nginx/html/about.html
+COPY styles.css /usr/share/nginx/html/styles.css
+
+# Add a custom Nginx configuration file
+COPY custom-nginx.conf /etc/nginx/nginx.conf
+
+# Install additional software (e.g., curl)
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get clean
+
+# Expose ports
+EXPOSE 80 443
+
+# Override the default command with a custom entrypoint script
+COPY entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# CMD can be left out if the entrypoint handles starting the service
+```
+
+#### Explanation of Extensions
+
+1. **FROM Instruction**: We start by extending the `nginx:1.21.0` image. This means that our Docker image will inherit everything from the base image (Nginx in this case).
+
+2. **WORKDIR**: The working directory is set to the root of the Nginx web host (`/usr/share/nginx/html`). This is where Nginx serves its content from, and all subsequent file operations will be relative to this directory.
+
+3. **COPY Instructions**: 
+    - The `index.html`, `about.html`, and `styles.css` files are copied into the container's web directory, allowing Nginx to serve them.
+    - A custom Nginx configuration file (`custom-nginx.conf`) is copied to override the default configuration. This could include custom server settings, virtual hosts, or security policies.
+
+4. **RUN Instruction**: 
+    - We install `curl` using the `apt-get` package manager. This can be useful for debugging, health checks, or other purposes.
+    - The `apt-get clean` command is used to remove unnecessary files and reduce the image size.
+
+5. **EXPOSE Instruction**: 
+    - Ports 80 (HTTP) and 443 (HTTPS) are exposed. This indicates to Docker that these ports should be made available to the host.
+
+6. **ENTRYPOINT and CMD Instructions**: 
+    - We override the default `CMD` with a custom `entrypoint.sh` script. This allows for more complex startup logic, such as environment variable substitution or dynamic configuration generation before starting Nginx.
+    - The `ENTRYPOINT` makes this script the primary executable, ensuring it runs first when the container starts.
+
+#### How to Extend
+
+Extending an official Docker image like Nginx is a common practice when you need to customize the base functionality to suit your needs. The key steps are:
+
+1. **Select a Base Image**: Choose an official image that provides the core functionality you need (e.g., Nginx for a web server).
+
+2. **Add Custom Content**: Use `COPY` to include any files or directories that should be part of your application (e.g., HTML files, configuration files).
+
+3. **Install Additional Software**: Use `RUN` to install packages or perform other setup tasks not included in the base image.
+
+4. **Customize Configuration**: Override or add configuration files to change the behavior of the software inside the container.
+
+5. **Define Entry Point**: Use `ENTRYPOINT` or `CMD` to specify what should happen when the container starts, allowing you to control the container’s execution flow.
+
+6. **Expose Ports**: Use `EXPOSE` to define which network ports should be accessible from outside the container.
+
+By following these steps, you can create Docker images that are tailored to your application's specific requirements.
