@@ -1022,3 +1022,30 @@ docker rmi elasticsearch:2
 docker container prune -f
 docker image prune -a -f
 ```
+
+### Additional Explanations of The Above Example
+
+In the context of Docker, the terms "network alias" and "name" refer to specific functionalities within Docker networking and container management.
+
+#### Network Alias
+A **network alias** in Docker is an additional name that you can assign to a container when it is connected to a network. This alias can be used by other containers on the same network to access the container. 
+
+In your example, the containers `es1` and `es2` are both given the network alias `search`:
+
+```bash
+docker run -d --name es1 --net mynetwork --network-alias search elasticsearch:2
+docker run -d --name es2 --net mynetwork --network-alias search elasticsearch:2
+```
+
+Both `es1` and `es2` containers can now be reached by other containers on the `mynetwork` using the alias `search`. This alias does not replace the container's name (`es1` and `es2`), but it provides an additional way to refer to the containers. When another container on the `mynetwork` attempts to access `search`, it could connect to either `es1` or `es2`, typically depending on load balancing or the order of DNS responses.
+
+#### Name in `grep name`
+In this context, `grep name` is used to filter the output of the `curl` command. 
+
+```bash
+docker run --rm --net mynetwork centos curl -s search:9200 | grep name
+```
+
+This command runs a CentOS container, which then uses `curl` to make an HTTP request to the service available at `search:9200`. The `-s` flag in `curl` makes the command silent, meaning it suppresses the progress meter and only outputs the response. The `| grep name` part of the command filters this output to only show lines that contain the word "name."
+
+This is typically done to check if the `elasticsearch` service is running properly and to verify which container (`es1` or `es2`) responded to the request. Elasticsearch responses often include fields like `"name": "some-container-name"`, so `grep name` helps to extract and display that information.
