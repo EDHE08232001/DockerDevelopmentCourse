@@ -518,3 +518,190 @@ CMD ["nginx", "-g", "daemon off;"]
 - **CMD**: Defines the default command to run when the container starts.
 
 This structure forms a repeatable and transparent process for creating Docker images. By understanding each part of the Dockerfile, you can customize and optimize your images for various use cases.
+
+## Building Images: Running `docker image build`
+
+Example:
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerBuildExample % docker image build --help
+Start a build
+
+Usage:  docker buildx build [OPTIONS] PATH | URL | -
+
+Start a build
+
+Aliases:
+  docker build, docker builder build, docker image build, docker buildx b
+
+Options:
+      --add-host strings              Add a custom host-to-IP mapping (format: "host:ip")
+      --allow strings                 Allow extra privileged entitlement (e.g., "network.host", "security.insecure")
+      --annotation stringArray        Add annotation to the image
+      --attest stringArray            Attestation parameters (format: "type=sbom,generator=image")
+      --build-arg stringArray         Set build-time variables
+      --build-context stringArray     Additional build contexts (e.g., name=path)
+      --builder string                Override the configured builder instance (default "desktop-linux")
+      --cache-from stringArray        External cache sources (e.g., "user/app:cache", "type=local,src=path/to/dir")
+      --cache-to stringArray          Cache export destinations (e.g., "user/app:cache", "type=local,dest=path/to/dir")
+      --call string                   Set method for evaluating build ("check", "outline", "targets") (default "build")
+      --cgroup-parent string          Set the parent cgroup for the "RUN" instructions during build
+      --check                         Shorthand for "--call=check" (default )
+  -f, --file string                   Name of the Dockerfile (default: "PATH/Dockerfile")
+      --iidfile string                Write the image ID to a file
+      --label stringArray             Set metadata for an image
+      --load                          Shorthand for "--output=type=docker"
+      --metadata-file string          Write build result metadata to a file
+      --network string                Set the networking mode for the "RUN" instructions during build (default "default")
+      --no-cache                      Do not use cache when building the image
+      --no-cache-filter stringArray   Do not cache specified stages
+  -o, --output stringArray            Output destination (format: "type=local,dest=path")
+      --platform stringArray          Set target platform for build
+      --progress string               Set type of progress output ("auto", "plain", "tty", "rawjson"). Use plain to show container output (default "auto")
+      --provenance string             Shorthand for "--attest=type=provenance"
+      --pull                          Always attempt to pull all referenced images
+      --push                          Shorthand for "--output=type=registry"
+  -q, --quiet                         Suppress the build output and print image ID on success
+      --sbom string                   Shorthand for "--attest=type=sbom"
+      --secret stringArray            Secret to expose to the build (format: "id=mysecret[,src=/local/secret]")
+      --shm-size bytes                Shared memory size for build containers
+      --ssh stringArray               SSH agent socket or keys to expose to the build (format: "default|<id>[=<socket>|<key>[,<key>]]")
+  -t, --tag stringArray               Name and optionally a tag (format: "name:tag")
+      --target string                 Set the target build stage to build
+      --ulimit ulimit                 Ulimit options (default [])
+
+Experimental commands and flags are hidden. Set BUILDX_EXPERIMENTAL=1 to show them.
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview 
+edwardhe@Edwards-MacBook-Air DockerBuildExample % 
+edwardhe@Edwards-MacBook-Air DockerBuildExample % docker image build -t customnginx .
+[+] Building 57.6s (7/7) FINISHED                                                                                                                                                    docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                                                                                                                 0.0s
+ => => transferring dockerfile: 6.83kB                                                                                                                                                               0.0s
+ => [internal] load metadata for docker.io/library/debian:bookworm-slim                                                                                                                              4.5s
+ => [auth] library/debian:pull token for registry-1.docker.io                                                                                                                                        0.0s
+ => [internal] load .dockerignore                                                                                                                                                                    0.0s
+ => => transferring context: 2B                                                                                                                                                                      0.0s
+ => [1/2] FROM docker.io/library/debian:bookworm-slim@sha256:2ccc7e39b0a6f504d252f807da1fc4b5bcd838e83e4dec3e2f57b2a4a64e7214                                                                       10.3s
+ => => resolve docker.io/library/debian:bookworm-slim@sha256:2ccc7e39b0a6f504d252f807da1fc4b5bcd838e83e4dec3e2f57b2a4a64e7214                                                                        0.0s
+ => => sha256:4735ff618e63fa90d91e11a6cd0ea73bcfe3859924de33076eaff2630a1f0232 1.46kB / 1.46kB                                                                                                       0.0s
+ => => sha256:e4fff0779e6ddd22366469f08626c3ab1884b5cbe1719b26da238c95f247b305 29.13MB / 29.13MB                                                                                                     6.2s
+ => => sha256:2ccc7e39b0a6f504d252f807da1fc4b5bcd838e83e4dec3e2f57b2a4a64e7214 1.85kB / 1.85kB                                                                                                       0.0s
+ => => sha256:70d4c04302bdcd71c4fa21b6c12e99888380a07f04e3d44452b961bca046489d 529B / 529B                                                                                                           0.0s
+ => => extracting sha256:e4fff0779e6ddd22366469f08626c3ab1884b5cbe1719b26da238c95f247b305                                                                                                            3.9s
+ => [2/2] RUN set -x     && groupadd --system --gid 101 nginx     && useradd --system --gid nginx --no-create-home --home /nonexistent --comment "nginx user" --shell /bin/false --uid 101 nginx    42.2s
+ => exporting to image                                                                                                                                                                               0.5s 
+ => => exporting layers                                                                                                                                                                              0.4s 
+ => => writing image sha256:ac33385c2afd9eaa4214f491cd25ed744df50bc031e42d86de449ced17114840                                                                                                         0.0s 
+ => => naming to docker.io/library/customnginx                                                                                                                                                       0.0s 
+                                                                                                                                                                                                          
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/x737ra5rwoxr3jdl7muwqkkdv                                                                                                
+
+ 3 warnings found (use docker --debug to expand):
+ - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 16)
+ - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 17)
+ - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 15)
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview 
+edwardhe@Edwards-MacBook-Air DockerBuildExample % 
+edwardhe@Edwards-MacBook-Air DockerBuildExample % ls
+Dockerfile
+edwardhe@Edwards-MacBook-Air DockerBuildExample % docker image list
+REPOSITORY    TAG       IMAGE ID       CREATED          SIZE
+customnginx   latest    ac33385c2afd   11 seconds ago   187MB
+```
+
+### Building Docker Images: Using the `docker image build` Command
+
+The `docker image build` command is essential for creating Docker images from a Dockerfile. This command processes the instructions in the Dockerfile, builds the image layer by layer, and finally outputs a Docker image that can be run as a container.
+
+### Basic Syntax
+
+```shell
+docker image build [OPTIONS] PATH | URL | -
+```
+
+- **PATH**: The path to the directory containing your Dockerfile.
+- **URL**: A Git URL where the Dockerfile is located.
+- **-**: Reads the Dockerfile from the standard input (stdin).
+
+#### Commonly Used Options
+
+- **`--file` (-f)**: Specify the Dockerfile to use (default is `PATH/Dockerfile`).
+- **`--tag` (-t)**: Name and optionally tag the image in the `name:tag` format.
+- **`--no-cache`**: Do not use cache when building the image, ensuring all steps are executed freshly.
+- **`--pull`**: Always attempt to pull newer versions of the base image.
+- **`--build-arg`**: Pass build-time variables to the Dockerfile, useful for dynamic configurations.
+- **`--platform`**: Set the target platform for the build, useful for cross-compilation.
+
+#### Example: Building an Image
+
+Below is an example that demonstrates how to build a Docker image using a Dockerfile.
+
+```zsh
+docker image build -t customnginx .
+```
+
+- **`-t customnginx`**: This option tags the image as `customnginx`.
+- **`.`**: This specifies the current directory as the build context, which should contain the Dockerfile.
+
+#### Step-by-Step Build Process
+
+Here’s a breakdown of what happens during the build:
+
+1. **Loading the Dockerfile**: Docker reads the instructions from the specified Dockerfile.
+    - Example: `load build definition from Dockerfile`
+2. **Fetching the Base Image**: Docker pulls the base image (e.g., `debian:bookworm-slim`) from the registry if it's not already available locally.
+    - Example: `load metadata for docker.io/library/debian:bookworm-slim`
+3. **Executing Dockerfile Instructions**: Each instruction in the Dockerfile (e.g., `RUN`, `COPY`, `ADD`) is executed, creating a new layer in the image.
+    - Example: `RUN set -x && groupadd ...`
+4. **Exporting the Image**: After executing all instructions, Docker exports the built layers into a final image.
+    - Example: `exporting to image`
+5. **Tagging the Image**: The image is tagged according to the `-t` option provided.
+    - Example: `naming to docker.io/library/customnginx`
+
+#### Viewing the Built Image
+
+Once the build process is complete, you can view the created image using:
+
+```zsh
+docker image list
+```
+
+This command lists all Docker images on your system. Example output:
+
+```zsh
+REPOSITORY    TAG       IMAGE ID       CREATED          SIZE
+customnginx   latest    ac33385c2afd   11 seconds ago   187MB
+```
+
+#### Debugging and Warnings
+
+During the build process, Docker may output warnings or errors. For instance, legacy syntax warnings like using `ENV key value` instead of `ENV key=value` may appear:
+
+```plaintext
+3 warnings found (use docker --debug to expand):
+ - LegacyKeyValueFormat: "ENV key=value" should be used instead of legacy "ENV key value" format (line 16)
+```
+
+To resolve these, ensure your Dockerfile follows the recommended syntax.
+
+#### Further Exploration
+
+- **Explore Image Vulnerabilities**: After building the image, you can view potential vulnerabilities and recommendations by running:
+
+```shell
+docker scout quickview
+```
+
+This command provides a summary of security issues and suggestions for improving the image's security posture.
+
+**Note**: If you want to ensure that all images are removed, even if they are associated with containers, you can combine the docker rmi command with the docker image prune -a command:
+
+`docker rmi $(docker images -q) -f`
+
+- docker rmi: Removes images by ID.
+- $(docker images -q): This returns a list of image IDs.
+- -f (or --force): Forces the removal of the images, even if they are being used by containers.
