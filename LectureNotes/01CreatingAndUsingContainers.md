@@ -362,7 +362,7 @@ ifconfig en0
     - The host machine has its own IP address which is used to communicate with the outside world. This is the IP you see when you run `ifconfig en0` or `ip a`.
 
 #### Explanation
-- Container IP: The command docker container inspect --format '{{ .NetworkSettings.IPAddress }}' <container name> fetches the IP address of the container within the Docker network. This IP address is used for communication between containers on the same Docker network.
+- Container IP: The command `docker container inspect --format '{{ .NetworkSettings.IPAddress }}' <container name>` fetches the IP address of the container within the Docker network. This IP address is used for communication between containers on the same Docker network.
 - Host IP: The command `ifconfig en0` or `ip a` fetches the IP address of the host machine's network interface (e.g., en0 on macOS or eth0 on Linux). This IP address is used for communication between the host machine and the outside world.
 
 #### What happens when a container is started:
