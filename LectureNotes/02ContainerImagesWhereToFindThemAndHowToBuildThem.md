@@ -15,5 +15,4 @@
 - **Not a complete OS**:  
   No kernel (since the host provides it), no kernel modules (e.g., drivers)
 - **Small as one file (your app binary)** like golang static binary
-- **If Big**:
-  Big as a Ubuntu distro with apt, and apache, PHP, and more installed
+- **Big** as a Ubuntu distro with apt, and apache, PHP, and more installed
