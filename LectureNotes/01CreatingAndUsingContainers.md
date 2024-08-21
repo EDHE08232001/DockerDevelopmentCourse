@@ -1049,3 +1049,57 @@ docker run --rm --net mynetwork centos curl -s search:9200 | grep name
 This command runs a CentOS container, which then uses `curl` to make an HTTP request to the service available at `search:9200`. The `-s` flag in `curl` makes the command silent, meaning it suppresses the progress meter and only outputs the response. The `| grep name` part of the command filters this output to only show lines that contain the word "name."
 
 This is typically done to check if the `elasticsearch` service is running properly and to verify which container (`es1` or `es2`) responded to the request. Elasticsearch responses often include fields like `"name": "some-container-name"`, so `grep name` helps to extract and display that information.
+
+### Explain Command `docker run --rm --net mynetwork centos curl -s search:9200 | grep name`
+
+Certainly! Let’s break down the `docker run` command with all its flags, options, and arguments:
+
+#### Full Command
+```bash
+docker run --rm --net mynetwork centos curl -s search:9200 | grep name
+```
+
+#### Breakdown of the Command
+
+###### 1. `docker run`
+This command starts a new container from a specified Docker image and executes a command inside it. After the command completes, the container stops.
+
+###### 2. `--rm`
+- **Flag:** `--rm`
+- **Description:** Automatically removes the container once the command inside it finishes. This flag ensures that the container doesn’t persist on your system after it has executed the given command, helping to keep your environment clean.
+
+###### 3. `--net mynetwork`
+- **Option:** `--net`
+- **Argument:** `mynetwork`
+- **Description:** Connects the container to the specified network (`mynetwork` in this case). By specifying a network, you enable the container to communicate with other containers on the same network.
+
+###### 4. `centos`
+- **Argument:** `centos`
+- **Description:** This specifies the Docker image to use for the container. In this case, it’s the `centos` image, which is a minimal installation of the CentOS operating system.
+
+###### 5. `curl -s search:9200`
+This part of the command is executed inside the CentOS container. Let’s break it down:
+
+- **Command:** `curl`
+  - **Description:** `curl` is a command-line tool used to transfer data to or from a server, using various protocols like HTTP, HTTPS, FTP, etc. In this case, it’s used to make an HTTP request to the Elasticsearch service.
+
+- **Flag:** `-s`
+  - **Description:** The `-s` flag stands for "silent." It suppresses the progress meter and error messages during the transfer, meaning only the response from the server is shown. This is useful when you want to process or filter the response without extra output clutter.
+
+- **Argument:** `search:9200`
+  - **Description:** This is the URL that `curl` will request. 
+    - `search`: This is the network alias defined for the containers `es1` and `es2`. The alias allows the container to be accessible via this name on the `mynetwork`.
+    - `9200`: This is the default port on which Elasticsearch listens for HTTP requests. The `search:9200` tells `curl` to make a request to whatever container is currently responding to the `search` alias on port 9200.
+
+###### 6. `| grep name`
+This part of the command is a standard Unix/Linux pipeline operation, not specific to Docker.
+
+- **Pipe (`|`):** The pipe takes the output of the `curl` command and sends it as input to the next command (`grep`).
+- **Command:** `grep`
+  - **Description:** `grep` is a command-line utility used for searching text using patterns. It searches the input it receives for lines that match the given pattern.
+
+- **Argument:** `name`
+  - **Description:** The pattern `grep` is searching for. It will filter the lines of the `curl` response and only display those that contain the word "name". This is useful for extracting specific information from the Elasticsearch JSON response, which typically includes a field named `"name"` that indicates the name of the node or container responding to the request.
+
+#### Summary
+The entire command starts a temporary CentOS container, attaches it to the `mynetwork` network, and makes an HTTP request to the `search` alias at port 9200. The response is filtered to show only lines containing the word "name," which helps identify which Elasticsearch container (`es1` or `es2`) responded to the request. After execution, the container is automatically removed due to the `--rm` flag.
