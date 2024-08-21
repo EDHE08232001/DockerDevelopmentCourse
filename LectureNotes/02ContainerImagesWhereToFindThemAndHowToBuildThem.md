@@ -70,23 +70,44 @@ Understanding the difference between tags and image versions allows you to manag
 
 ## Image Layers and the Image Cache: A Deeper Look
 
-1. **Image Layers**: Docker images are built in layers, where each layer represents a change or addition to the image.
-2. **Union File System**: Layers are combined using a union file system, which allows for efficient storage and retrieval.
-3. **History and Inspect Commands**: Use `docker image history <image>` to view the history of an image.
-4. **Copy-on-Write**: When an image is modified, only the changes are stored, thanks to Docker's copy-on-write mechanism.
+Docker images are constructed from layers, which are critical to the efficient use of resources and consistent image management. Understanding how these layers work can greatly improve how you build, manage, and optimize Docker images.
 
-### Using the `docker image history` Command
+### 1. **Image Layers**
 
-```zsh
-edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image history nginx:latest
-Error response from daemon: No such image: nginx:latest
+- **Concept**: Docker images are built in layers. Each layer represents a set of changes, like adding a file, installing a package, or configuring settings.
+- **Layer Composition**: For example, an Ubuntu-based image may have layers for:
+  1. The base Ubuntu system.
+  2. Installed packages like Python.
+  3. Application-specific files and dependencies.
+- **Layer Efficiency**: Layers that remain unchanged between builds are reused, which speeds up the image creation process and reduces the amount of data transferred when images are shared.
+
+**Example**:
+```Dockerfile
+# Base image layer
+FROM ubuntu:20.04
+
+# Layer 1: Install Python
+RUN apt-get update && apt-get install -y python3
+
+# Layer 2: Copy application files
+COPY . /app
+
+# Layer 3: Set up environment variables
+ENV APP_ENV=production
 ```
+In this Dockerfile:
+- Each `RUN`, `COPY`, and `ENV` command creates a new layer.
+- If the base image or Python installation hasn’t changed, Docker will reuse those layers from its cache in future builds.
 
-In this example, the command attempts to retrieve the history of the `nginx:latest` image. The error indicates that the image does not exist locally.
+### 2. **Union File System**
 
-**Note**: Every new image begins with a base layer called "scratch." Any subsequent changes to the image create new layers.
+- **Concept**: The Union File System (UFS) allows Docker to stack these layers together into a single, coherent file system. When you interact with a container, it feels like a complete filesystem, but behind the scenes, it's composed of these layered snapshots.
+- **Layer Interaction**: The UFS ensures that any changes made to the file system (like creating a file or modifying a configuration) are stored in a new top layer without altering the original layers.
 
-### Exploring `docker image history` Options
+**Example**:
+- Imagine a Docker container built from an Ubuntu image with a Python layer on top. The UFS presents a unified view where both the Ubuntu OS and Python are available as part of a single file system, even though they reside in separate layers.
+
+### 3. **History and Inspect Commands**
 
 ```zsh
 edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image history --help
@@ -105,14 +126,10 @@ Options:
                         'json':             Print in JSON format
                         'TEMPLATE':         Print output using the given Go template.
                         Refer to https://docs.docker.com/go/formatting/ for more information about formatting output with templates
-  -H, --human           Print sizes and dates in human-readable format (default true)
+  -H, --human           Print sizes and dates in human readable format (default true)
       --no-trunc        Don't truncate output
   -q, --quiet           Only show image IDs
-```
-
-### Using the `docker image inspect` Command
-
-```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % 
 edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image inspect --help
 
 Usage:  docker image inspect [OPTIONS] IMAGE [IMAGE...]
@@ -125,3 +142,42 @@ Options:
                         'TEMPLATE':         Print output using the given Go template.
                         Refer to https://docs.docker.com/go/formatting/ for more information about formatting output with templates
 ```
+
+- **History Command**: Use `docker image history <image>` to view all the layers that make up an image. This command shows the commands used to create each layer, making it easier to understand how the image was constructed.
+
+**Example**:
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image history nginx:latest
+IMAGE          CREATED          CREATED BY                                      SIZE
+7e4d58f0e5f3   3 days ago       /bin/sh -c #(nop)  CMD ["nginx" "-g" "daemon o… 0B
+```
+
+- **Inspect Command**: Use `docker image inspect <image>` to get detailed information about an image, including its layers, configuration, and metadata.
+
+**Example**:
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image inspect nginx:latest
+[
+    {
+        "Id": "sha256:7e4d58f0e5f36e...",
+        "RepoTags": [
+            "nginx:latest"
+        ],
+        "Created": "2023-08-15T07:29:51.196Z",
+        "Size": 133114949,
+        ...
+    }
+]
+```
+
+### 4. **Copy-on-Write**
+
+- **Concept**: Docker uses a copy-on-write (CoW) mechanism. When a container based on an image is started, it begins with a read-only copy of the image. Any modifications made by the container are not written back to the image but are instead stored in a new, writable layer.
+- **Efficiency**: This approach allows multiple containers to share the same image while maintaining their own isolated changes.
+
+**Example**:
+- Suppose you have a container running an Nginx server based on the `nginx:latest` image. If you modify the Nginx configuration file within the container, Docker stores this change in a new layer without altering the original `nginx:latest` image.
+
+### Summary of Docker Layers and Mechanisms
+
+By leveraging Docker's layered architecture and commands like `history` and `inspect`, you can better manage and optimize container images. Understanding these concepts also helps in debugging issues related to image size, build times, and deployment consistency.
