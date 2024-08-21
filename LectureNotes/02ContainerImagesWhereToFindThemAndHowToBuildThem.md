@@ -72,8 +72,7 @@ By understanding the difference between tags and image versions, you can better 
 3. `history` and `inspect` command
 4. copy on write
 
-Command: `docker image history [image]`
-    - Use the this command to view the history of a specific Docker image
+Command: `docker image history [image]`, use this command to view the history of a specific Docker image
 
 ```zsh
 edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image history nginx:latest
