@@ -454,7 +454,7 @@ Docker daemon has a built-in DNS server that containers use by default
 ### DNS Default Names
 Docker defaults the hostname to the container's name, but you can also set aliases
 
-Lets say, for example, you have two containers on yoru own customized network, a and b
+Lets say, for example, you have two containers on your own customized network, a and b
 
 you can do `docker container exec -it my_nginx ping new_nginx` and `docker container exec -it new_nginx ping my_nginx`
 
