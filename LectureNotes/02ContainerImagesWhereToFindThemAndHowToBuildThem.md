@@ -65,3 +65,44 @@ In the above example:
 4. **Image Digest**: Each image has a unique digest (a SHA256 hash) that ensures its integrity and consistency across different environments. This digest is displayed after pulling an image.
 
 By understanding the difference between tags and image versions, you can better manage your Docker images and avoid unnecessary downloads and redundancies.
+
+## Images and Their Layers: Discover the Image Cache
+1. Image Layers
+2. Union File System
+3. `history` and `inspect` command
+4. copy on write
+
+Command: `docker image history [image]`
+    - Use the this command to view the history of a specific Docker image
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image history nginx:latest
+Error response from daemon: No such image: nginx:latest
+```
+
+In this example, the command attempts to retrieve the history of the nginx:latest image. The error indicates that the image does not exist locally.
+
+### Using the history Command with Options
+
+```zsh
+edwardhe@Edwards-MacBook-Air DockerDevelopmentCourse % docker image history --help
+
+Usage:  docker image history [OPTIONS] IMAGE
+
+Show the history of an image
+
+Aliases:
+  docker image history, docker history
+
+Options:
+      --format string   Format output using a custom template:
+                        'table':            Print output in table format with column headers (default)
+                        'table TEMPLATE':   Print output in table format using the given Go template
+                        'json':             Print in JSON format
+                        'TEMPLATE':         Print output using the given Go template.
+                        Refer to https://docs.docker.com/go/formatting/ for more information about formatting output with templates
+  -H, --human           Print sizes and dates in human-readable format (default true)
+      --no-trunc        Don't truncate output
+  -q, --quiet           Only show image IDs
+```
+
