@@ -825,3 +825,161 @@ By following these steps, you can create Docker images that are tailored to your
 4. Expect it to be iterative. Rarely do I get it right the first time
 5. Details in `dockerfile-assignment-1/Dockerfile`
 6. Use the Alpine version of the official `node` 6.x image
+7. Expected result is web site at http://localhost
+8. Tag and Push to your Docker Hub account (free)
+9. Remove your image and created container from local cache, run again from Hub
+10. Afther all above, do cleanup
+
+### Instructions from the app developer
+
+- you should use the `node` official image, with the alpine 6.x branch (`node:6-alpine`)
+  - (Yes this is a 2-year old image of node, but all official images are always available on Docker Hub forever, to ensure even old apps still work. It is common to still need to deploy old app versions, even years later.)
+- This app listens on port 3000, but the container should listen on port 80 of the Docker host, so it will respond to [http://localhost:80](http://localhost:80) on your computer
+- Then it should use the alpine package manager to install tini: `apk add --no-cache tini`.
+- Then it should create directory /usr/src/app for app files with `mkdir -p /usr/src/app`, or with the Dockerfile command `WORKDIR /usr/src/app`.
+- Node.js uses a "package manager", so it needs to copy in package.json file.
+- Then it needs to run 'npm install' to install dependencies from that file.
+- To keep it clean and small, run `npm cache clean --force` after the above, in the same RUN command.
+- Then it needs to copy in all files from current directory into the image.
+- Then it needs to start the container with the command `/sbin/tini -- node ./bin/www`. Be sure to use JSON array syntax for CMD. (`CMD [ "something", "something" ]`)
+- In the end you should be using FROM, RUN, WORKDIR, COPY, EXPOSE, and CMD commands
+
+### My Dockerfile
+
+```Dockerfile
+# Use the official Node.js image based on Alpine Linux
+FROM node:6-alpine
+
+# Install tini via Alpine package manager
+RUN apk add --no-cache tini
+
+# Set working directory to /usr/src/app
+WORKDIR /usr/src/app
+
+# Copy the package.json file into the image
+COPY package.json ./
+
+# Install dependencies and clean up npm cache
+RUN npm install && npm cache clean --force
+
+# Copy all the files from the current directory to the container
+COPY . .
+
+# Expose port 80 to the Docker host
+EXPOSE 80
+
+# Start the application using tini to manage Node.js
+CMD ["/sbin/tini", "--", "node", "./bin/www"]
+```
+
+### My ZSH Command Steps
+
+```zsh
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker build -t edhe08232001/node-app .
+[+] Building 26.7s (12/12) FINISHED                                                                                                                                          docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                                                                                                         0.0s
+ => => transferring dockerfile: 835B                                                                                                                                                         0.0s
+ => [internal] load metadata for docker.io/library/node:6-alpine                                                                                                                             4.1s
+ => [auth] library/node:pull token for registry-1.docker.io                                                                                                                                  0.0s
+ => [internal] load .dockerignore                                                                                                                                                            0.0s
+ => => transferring context: 527B                                                                                                                                                            0.0s
+ => [1/6] FROM docker.io/library/node:6-alpine@sha256:17258206fc9256633c7100006b1cfdf25b129b6a40b8e5d37c175026482c84e3                                                                       5.5s
+ => => resolve docker.io/library/node:6-alpine@sha256:17258206fc9256633c7100006b1cfdf25b129b6a40b8e5d37c175026482c84e3                                                                       0.0s
+ => => sha256:e9fa13fdf0f5f7d338eba59bab8b18d1b49e35550bb17659a4806be99423cecc 15.45MB / 15.45MB                                                                                             3.4s
+ => => sha256:ccc877228d8f9d2009e6d278a5757937b4b379b91561353c60462cc2b9ad884b 1.33MB / 1.33MB                                                                                               1.4s
+ => => sha256:17258206fc9256633c7100006b1cfdf25b129b6a40b8e5d37c175026482c84e3 1.72kB / 1.72kB                                                                                               0.0s
+ => => sha256:ac775e5c37b78443690a840b22973dd5a60ff2cc17ecd1d3921a45e831071d61 951B / 951B                                                                                                   0.0s
+ => => sha256:dfc29bfa7d41dd1616257cfe7cb4462c8fd566e9c4d2b2cefb5ea2adf57ad6b8 5.23kB / 5.23kB                                                                                               0.0s
+ => => sha256:bdf0201b3a056acc4d6062cc88cd8a4ad5979983bfb640f15a145e09ed985f92 2.76MB / 2.76MB                                                                                               2.2s
+ => => extracting sha256:bdf0201b3a056acc4d6062cc88cd8a4ad5979983bfb640f15a145e09ed985f92                                                                                                    0.2s
+ => => extracting sha256:e9fa13fdf0f5f7d338eba59bab8b18d1b49e35550bb17659a4806be99423cecc                                                                                                    1.8s
+ => => extracting sha256:ccc877228d8f9d2009e6d278a5757937b4b379b91561353c60462cc2b9ad884b                                                                                                    0.1s
+ => [internal] load build context                                                                                                                                                            0.0s
+ => => transferring context: 429.80kB                                                                                                                                                        0.0s
+ => [2/6] RUN apk add --no-cache tini                                                                                                                                                        1.5s
+ => [3/6] WORKDIR /usr/src/app                                                                                                                                                               0.0s 
+ => [4/6] COPY package.json ./                                                                                                                                                               0.0s 
+ => [5/6] RUN npm install && npm cache clean --force                                                                                                                                        15.1s 
+ => [6/6] COPY . .                                                                                                                                                                           0.0s
+ => exporting to image                                                                                                                                                                       0.2s
+ => => exporting layers                                                                                                                                                                      0.1s
+ => => writing image sha256:2f3190174d4ada6353a40e990aee4728f237bbb6540a7af52e64beb22b3dee67                                                                                                 0.0s
+ => => naming to docker.io/edhe08232001/node-app                                                                                                                                             0.0s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/y0duhe9mxvrr2v33u7y75225v
+
+What's next:
+    View a summary of image vulnerabilities and recommendations → docker scout quickview 
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker run -p 80:3000 edhe08232001/node-app
+GET / 200 128.248 ms - 290
+GET /stylesheets/style.css 200 6.276 ms - 111
+GET /images/picard.gif 200 5.207 ms - 417700
+GET /favicon.ico 404 9.505 ms - 970
+^C%                                                                                                                                                                                               
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker push edhe08232001/node-app
+Using default tag: latest
+The push refers to repository [docker.io/edhe08232001/node-app]
+79ce2aa036e6: Pushed 
+9ca6ff453045: Pushed 
+f30f736412f0: Pushed 
+2ea5e11f7493: Pushed 
+be06dc12ec87: Pushed 
+f168d52a989d: Mounted from library/node 
+17b7c23fba03: Mounted from library/node 
+a464c54f93a9: Mounted from library/node 
+latest: digest: sha256:861f88163b3df68a27cab8efd5d330a63ff08b10b36d66bf5560056581b3c680 size: 1995
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker rm -f $(docker ps -aq)
+2a2f806cb65f
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker rmi edhe08232001/node-app
+Untagged: edhe08232001/node-app:latest
+Untagged: edhe08232001/node-app@sha256:861f88163b3df68a27cab8efd5d330a63ff08b10b36d66bf5560056581b3c680
+Deleted: sha256:2f3190174d4ada6353a40e990aee4728f237bbb6540a7af52e64beb22b3dee67
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker image list
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker container list
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker container run -p 80:3000 edhe08232001/node-app
+Unable to find image 'edhe08232001/node-app:latest' locally
+latest: Pulling from edhe08232001/node-app
+bdf0201b3a05: Already exists 
+e9fa13fdf0f5: Already exists 
+ccc877228d8f: Already exists 
+023a5a1d9f48: Already exists 
+4d152678ac22: Already exists 
+c0416c0632ad: Already exists 
+697ae7bcfdd3: Already exists 
+c654f67cf82e: Already exists 
+Digest: sha256:861f88163b3df68a27cab8efd5d330a63ff08b10b36d66bf5560056581b3c680
+Status: Downloaded newer image for edhe08232001/node-app:latest
+GET / 304 88.035 ms - -
+GET /images/picard.gif 304 3.548 ms - -
+GET /stylesheets/style.css 304 0.937 ms - -
+^C%                                                                                                                                                                                               
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker system prune -af
+Deleted Containers:
+5e44e4e008636f5a783e773260cfa7d7f47c030e57b3abbe3140be0517f476b1
+
+Deleted Images:
+untagged: edhe08232001/node-app:latest
+untagged: edhe08232001/node-app@sha256:861f88163b3df68a27cab8efd5d330a63ff08b10b36d66bf5560056581b3c680
+deleted: sha256:2f3190174d4ada6353a40e990aee4728f237bbb6540a7af52e64beb22b3dee67
+
+Deleted build cache objects:
+mtpf44p8iqb7v7g1155ls0hns
+ph6apr6evs495mgw7tg7ede2r
+zt9day14rtx8upf4dbp7el3nw
+i021deqxoux3i0n2ibp1cdxqw
+sckbd6smm6c3kvvashvfsegkq
+49u2u9y85ze4lfgvpjzheq3qk
+60pmjhu0wh5w318vflt3ph0k6
+bdef19ipd175gh9z4p5gv6s4p
+upzfzgbbjq7by4ce35s97gen4
+pks0hsboimvzke8w5zb2fnuiu
+pikpxovfwpstscl308a2rmg4k
+
+Total reclaimed space: 8.554MB
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker container list
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker image list
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+```
