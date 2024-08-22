@@ -921,6 +921,34 @@ CMD ["/sbin/tini", "--", "node", "./bin/www"]
 
 This enhanced study note should give you a deeper understanding of each part of your Dockerfile and the best practices involved in Dockerizing an application.
 
+#### Note:
+
+Let's break down the `COPY` commands and their components in the Dockerfile:
+
+##### `COPY package.json ./`
+
+- **`package.json`**:
+  - This is the source file that you want to copy into the Docker image. It is located in the current directory on your host machine (where you're running the `docker build` command). The `package.json` file contains metadata about your Node.js project, including its dependencies, scripts, and other configuration details.
+
+- **`./`**:
+  - This is the destination path inside the Docker image. The `./` refers to the current working directory within the Docker image, which is set by the previous `WORKDIR /usr/src/app` instruction in the Dockerfile. So, `./` here means that `package.json` will be copied to the `/usr/src/app` directory inside the container.
+
+##### `COPY . .`
+
+- **First `.` (dot)**:
+  - This refers to the source directory on the host machine. The single dot (`.`) represents the current directory where the Docker build context is located (the directory from which you ran the `docker build` command). This means all files and subdirectories within this current directory will be copied into the Docker image.
+
+- **Second `.` (dot)**:
+  - This is the destination directory inside the Docker image. Like in the previous command, this dot represents the current working directory inside the Docker image, which is `/usr/src/app` (as set by `WORKDIR`). So, all the files from the current directory on your host will be copied into `/usr/src/app` inside the Docker image.
+
+##### Summary:
+
+- **`package.json`**: Located in the current directory on your host machine, it's copied to `/usr/src/app` inside the Docker image.
+- **First `.` in `COPY . .`**: Represents the entire current directory on your host machine, including all files and subdirectories.
+- **Second `.` in `COPY . .`**: Represents the current working directory inside the Docker image, which is `/usr/src/app`.
+
+This setup ensures that all necessary files, including `package.json` and the rest of the application code, are copied into the correct directory within the Docker image, allowing the application to run properly in the container.
+
 ### My ZSH Command Steps
 
 ```zsh
