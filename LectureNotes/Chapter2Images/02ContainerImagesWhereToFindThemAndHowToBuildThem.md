@@ -1166,7 +1166,9 @@ docker image list
 
 - **Docker Prune:** This command is powerful but should be used with caution. `docker system prune -af` will remove all unused containers, images, networks, and build caches. The `-f` flag skips the confirmation prompt, so make sure you don't need any of the data being pruned.
 
-In the command `docker build -t edhe08232001/node-app .`, the `.` (dot) at the end represents the **build context**. Here's a breakdown:
+----
+
+### In the command `docker build -t edhe08232001/node-app .`, the `.` (dot) at the end represents the **build context**. Here's a breakdown:
 
 #### **What is the Build Context?**
 
