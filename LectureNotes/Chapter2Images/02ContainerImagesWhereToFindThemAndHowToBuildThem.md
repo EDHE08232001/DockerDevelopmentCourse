@@ -817,3 +817,11 @@ Extending an official Docker image like Nginx is a common practice when you need
 6. **Expose Ports**: Use `EXPOSE` to define which network ports should be accessible from outside the container.
 
 By following these steps, you can create Docker images that are tailored to your application's specific requirements.
+
+## Practice Assignment: Build Your Own Image
+1. Dockerfiles are part process workflow and part art
+2. Take existing Node.js app and Dockerize it
+3. Make **Dockerfile**. Build it. Test it. Push it. (rm it). Run it.
+4. Expect it to be iterative. Rarely do I get it right the first time
+5. Details in `dockerfile-assignment-1/Dockerfile`
+6. Use the Alpine version of the official `node` 6.x image
