@@ -848,29 +848,78 @@ By following these steps, you can create Docker images that are tailored to your
 
 ```Dockerfile
 # Use the official Node.js image based on Alpine Linux
+# The `FROM` instruction sets the base image for subsequent instructions.
+# Here, we are using the `node:6-alpine` image, which is a lightweight version
+# of Node.js 6.x built on top of Alpine Linux, a minimalistic distribution
+# that helps keep the image size small.
 FROM node:6-alpine
 
 # Install tini via Alpine package manager
+# The `RUN` instruction is used to execute commands during the build process.
+# `apk add --no-cache tini` installs the `tini` package, a small but powerful
+# init system, which helps manage the lifecycle of the Node.js process and 
+# handles tasks like process reaping. The `--no-cache` option ensures that 
+# package index files aren't stored in the Docker image, keeping it small.
 RUN apk add --no-cache tini
 
 # Set working directory to /usr/src/app
+# The `WORKDIR` instruction sets the working directory for any subsequent 
+# `COPY`, `RUN`, and `CMD` instructions. If the directory doesn't exist,
+# it will be created automatically. This is where our application files 
+# will reside inside the container.
 WORKDIR /usr/src/app
 
 # Copy the package.json file into the image
+# The `COPY` instruction copies files and directories from the host file system
+# into the Docker image. Here, we're copying the `package.json` file from the 
+# current directory on the host into the working directory (`/usr/src/app`) 
+# of the container. The `package.json` file contains the metadata for the project,
+# including dependencies that need to be installed.
 COPY package.json ./
 
 # Install dependencies and clean up npm cache
+# This `RUN` instruction does two things in a single layer:
+# 1. Runs `npm install` to install all dependencies listed in `package.json`.
+# 2. Cleans up the npm cache using `npm cache clean --force` to reduce the 
+#    size of the image. This ensures that no unnecessary files are left behind.
+# Combining commands with `&&` allows them to be executed in one layer, 
+# further optimizing the image size.
 RUN npm install && npm cache clean --force
 
 # Copy all the files from the current directory to the container
+# The second `COPY` instruction copies all files from the current directory 
+# on the host to the working directory (`/usr/src/app`) in the container.
+# This includes the application code and any other necessary files.
 COPY . .
 
 # Expose port 80 to the Docker host
+# The `EXPOSE` instruction informs Docker that the container listens on the 
+# specified network ports at runtime. Here, we're exposing port 80, which is 
+# the default HTTP port. Although this doesn't actually publish the port, 
+# it's a good practice to document the intended network usage.
 EXPOSE 80
 
 # Start the application using tini to manage Node.js
+# The `CMD` instruction specifies the command to run when the container starts.
+# Here, we're using `tini` as the init system to manage the Node.js process,
+# ensuring that the application is properly started and any child processes
+# are handled correctly. The `CMD` instruction uses the JSON array format, 
+# which is the preferred format as it prevents the command from being 
+# interpreted by the shell.
 CMD ["/sbin/tini", "--", "node", "./bin/www"]
 ```
+
+#### Additional Notes:
+
+- **Layer Caching:** Docker builds images in layers. Each instruction in the Dockerfile creates a new layer, and Docker caches these layers. This is why it's efficient to order commands that change less frequently towards the top of the Dockerfile (e.g., installing dependencies) and commands that change frequently (e.g., copying the source code) towards the bottom. This way, Docker can reuse cached layers and only rebuild layers that have changed.
+  
+- **Alpine Linux:** Using Alpine Linux as a base image is a common practice in Docker due to its small size (~5 MB), which helps in creating minimal images. However, because it is minimalistic, some common tools and libraries might be missing, so you might need to install them manually if required.
+
+- **Tini:** `Tini` is a simple init system that helps in properly managing child processes within containers. Containers run with a single process by default, and if that process spawns child processes, they can become orphaned when the main process exits. `Tini` ensures proper process handling, making it a good practice to use in production environments.
+
+- **CMD vs. ENTRYPOINT:** `CMD` sets the default command and/or parameters when a container is run without specifying a command. If `ENTRYPOINT` is used instead, it configures the container to run as an executable. Typically, you'd use `CMD` for default behavior that can be overridden by the user, and `ENTRYPOINT` for a fixed command that should always run.
+
+This enhanced study note should give you a deeper understanding of each part of your Dockerfile and the best practices involved in Dockerizing an application.
 
 ### My ZSH Command Steps
 
@@ -983,3 +1032,110 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 edwardhe@Edwards-MacBook-Air dockerfile-assignment-1 % docker image list
 REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
 ```
+
+#### My ZSH Command Steps Explanation
+
+```zsh
+# Build the Docker image with a specific tag
+# `docker build` builds a Docker image from a Dockerfile and a "context" (the files in the current directory).
+# `-t edhe08232001/node-app` tags the built image with the name `edhe08232001/node-app`. This makes it easier to refer to the image later.
+# `.` specifies the build context, meaning the current directory.
+docker build -t edhe08232001/node-app .
+
+# Output (example):
+# [+] Building 26.7s (12/12) FINISHED
+# This output shows the progress of each step in the Dockerfile, with timings.
+
+# Run the Docker container, mapping port 80 on the host to port 3000 in the container
+# `docker run` creates and starts a container from an image.
+# `-p 80:3000` maps port 80 on the host (your computer) to port 3000 in the container, allowing you to access the application at `http://localhost`.
+docker run -p 80:3000 edhe08232001/node-app
+
+# Output (example):
+# GET / 200 128.248 ms - 290
+# This shows HTTP requests being made to the server running in the container.
+
+# Push the Docker image to Docker Hub
+# `docker push` uploads an image to a Docker registry, in this case, Docker Hub.
+# `edhe08232001/node-app` specifies the image to push. The image must be tagged with a repository name (like `edhe08232001/node-app`) to be pushed.
+docker push edhe08232001/node-app
+
+# Output (example):
+# The push refers to repository [docker.io/edhe08232001/node-app]
+# This output shows the progress of pushing each layer of the image to Docker Hub.
+
+# Remove all containers (both running and stopped)
+# `docker rm` removes one or more containers.
+# `-f` forces the removal of running containers (stops them before removal).
+# `$(docker ps -aq)` gets the IDs of all containers (`-a` lists all containers, and `-q` returns only the IDs).
+docker rm -f $(docker ps -aq)
+
+# Remove the Docker image from the local system
+# `docker rmi` removes one or more Docker images.
+# `edhe08232001/node-app` specifies the image to remove. By default, Docker tries to untag the image first, then delete it if no containers are using it.
+docker rmi edhe08232001/node-app
+
+# Output (example):
+# Untagged: edhe08232001/node-app:latest
+# This output shows that the image has been untagged and then deleted.
+
+# List all Docker images on the system
+# `docker image list` lists all Docker images stored locally.
+docker image list
+
+# Output (example):
+# REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+# This output lists the repository name, tag, image ID, creation date, and size of each image.
+
+# List all Docker containers (both running and stopped)
+# `docker container list` lists all running containers by default.
+# `-a` flag lists all containers, including stopped ones.
+docker container list
+
+# Run the Docker container again, pulling the image from Docker Hub if it doesn't exist locally
+# `docker container run` creates and starts a container.
+# `-p 80:3000` maps port 80 on the host to port 3000 in the container.
+# `Unable to find image 'edhe08232001/node-app:latest' locally` indicates that Docker couldn't find the image locally, so it pulls it from Docker Hub.
+docker container run -p 80:3000 edhe08232001/node-app
+
+# Output (example):
+# Digest: sha256:861f88163b3df68a27cab8efd5d330a63ff08b10b36d66bf5560056581b3c680
+# This output shows the status of the container, including which image was pulled and the image digest.
+
+# Remove all unused data (containers, networks, images, build cache)
+# `docker system prune` cleans up unused Docker objects.
+# `-a` flag includes unused images in the cleanup.
+# `-f` flag forces the cleanup without prompting for confirmation.
+docker system prune -af
+
+# Output (example):
+# Deleted Containers: 
+# Deleted Images:
+# This output shows the IDs of all removed containers and images, along with the total reclaimed space.
+
+# List all Docker containers (should be empty after prune)
+docker container list
+
+# Output (example):
+# CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+# This shows that no containers are currently present.
+
+# List all Docker images (should be empty after prune)
+docker image list
+
+# Output (example):
+# REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+# This shows that no images are currently present.
+```
+
+---
+
+##### Additional Notes:
+
+- **Docker Build Context:** The context is the set of files and directories that Docker uses to build the image. The `.` at the end of `docker build` means the current directory is used as the context. This is important because only files in the context can be accessed by the Dockerfile.
+
+- **Docker Run with Port Mapping:** The `-p` flag in `docker run` is crucial for connecting the host machine to the container. The format `hostPort:containerPort` maps a port on the host to a port inside the container. This is how you can expose a web server running in the container to the outside world.
+
+- **Docker Prune:** This command is powerful but should be used with caution. `docker system prune -af` will remove all unused containers, images, networks, and build caches. The `-f` flag skips the confirmation prompt, so make sure you don't need any of the data being pruned.
+
+This enhanced guide should help you understand the reasoning behind each command and how the options and flags influence Docker's behavior.
